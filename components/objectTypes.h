@@ -19,3 +19,18 @@ enum class MeshType
 	Floor,
 	Cube
 };
+
+enum class TextureType
+{
+	Checker,
+	SpaceshipMetal,
+	CheckerMetal,
+	CheckerRoughness
+};
+
+
+enum class ModelType
+{
+	Spaceship
+};
+

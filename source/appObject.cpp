@@ -3,8 +3,8 @@
 
 void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
                             std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
-                            std::vector<std::unique_ptr<Texture>>& textureList,
-                            std::vector<std::unique_ptr<Model>>& modelList,
+                            std::unordered_map<TextureType, std::unique_ptr<Texture>>& textureList,
+                            std::unordered_map<ModelType, std::unique_ptr<Model>>& modelList, 
                             std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList)
 {
     // floor
@@ -13,9 +13,10 @@ void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
     floor_model = glm::scale(floor_model,
         glm::vec3(2.0f, 1.0f, 2.0f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(floor_model));
-    textureList[0]->UseTexture(GL_TEXTURE7);
-    textureList[2]->UseTexture(GL_TEXTURE10);
-    textureList[3]->UseTexture(GL_TEXTURE9);      
+    
+    textureList.at(TextureType::Checker)->UseTexture(GL_TEXTURE7);
+    textureList.at(TextureType::CheckerMetal)->UseTexture(GL_TEXTURE10);
+    textureList.at(TextureType::CheckerRoughness)->UseTexture(GL_TEXTURE9);
     shaderList.at(ShaderType::Main)->SetTexture(7);
     meshList.at(MeshType::Floor)->Draw();
 
@@ -23,18 +24,18 @@ void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-    textureList[1]->UseTexture(GL_TEXTURE10);
+    textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
     shaderList.at(ShaderType::Main)->SetTexture(8);
     
-    modelList[0]->RenderModel();
+    modelList.at(ModelType::Spaceship)->RenderModel();
 
 
 }
 
 void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
                             std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
-                            std::vector<std::unique_ptr<Texture>>& textureList,
-                            std::vector<std::unique_ptr<Model>>& modelList,
+                            std::unordered_map<TextureType, std::unique_ptr<Texture>>& textureList,
+                            std::unordered_map<ModelType, std::unique_ptr<Model>>& modelList,
                             std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList,
                             std::vector<std::unique_ptr<DirectionalLight>>& DirectionalLightList,
                             std::vector<std::unique_ptr<PointLight>>& PointLightList,

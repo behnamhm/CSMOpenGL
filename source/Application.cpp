@@ -18,13 +18,22 @@ void Application::Init()
     InitMesh(MeshType::Floor);
     InitMesh(MeshType::Cube);
 
+    InitTexture(TextureType::Checker);
+    InitTexture(TextureType::SpaceshipMetal);
+    InitTexture(TextureType::CheckerMetal);
+    InitTexture(TextureType::CheckerRoughness);
+
+    InitModel(ModelType::Spaceship);
+
+
 }
 
 void Application::Run()
 {
-    // window init
+    // window and objects initialisation
     Init();
 
+    // shaders
     shaderList[ShaderType::Main]->CreateFromFiles("assets/shaders/vertex.glsl",
                                                    "assets/shaders/fragment.glsl");
 
@@ -52,25 +61,20 @@ void Application::Run()
     meshList[MeshType::Cube]->DrawCube();
 
     // textures
-    textureList.push_back(std::make_unique<Texture>());
-    *textureList[0] = Texture("assets/textures/checker.png");
-    textureList[0]->LoadTexture();
+    *textureList[TextureType::Checker] = Texture("assets/textures/checker.png");
+    textureList[TextureType::Checker]->LoadTexture();
 
-    textureList.push_back(std::make_unique<Texture>());
-    *textureList[1] = Texture("assets/textures/Intergalactic Spaceship_metalness.jpg");
-    textureList[1]->LoadTexture();
+    *textureList[TextureType::SpaceshipMetal] = Texture("assets/textures/Intergalactic Spaceship_metalness.jpg");
+    textureList[TextureType::SpaceshipMetal]->LoadTexture();
 
-    textureList.push_back(std::make_unique<Texture>());
-    *textureList[2] = Texture("assets/textures/checkerMetal.png");
-    textureList[2]->LoadTextureA();
+    *textureList[TextureType::CheckerMetal] = Texture("assets/textures/checkerMetal.png");
+    textureList[TextureType::CheckerMetal]->LoadTextureA();
 
-    textureList.push_back(std::make_unique<Texture>());
-    *textureList[3] = Texture("assets/textures/checkerRoughness.png");
-    textureList[3]->LoadTextureA();
+    *textureList[TextureType::CheckerRoughness] = Texture("assets/textures/checkerRoughness.png");
+    textureList[TextureType::CheckerRoughness]->LoadTextureA();
 
     // models
-    modelList.push_back(std::make_unique<Model>());
-    modelList[0]->LoadModel("assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
+    modelList[ModelType::Spaceship]->LoadModel("assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
    
     // lights
     DirectionalLightList.push_back(std::make_unique<DirectionalLight>(DirectionalLight(2048, 2048,

@@ -23,15 +23,15 @@ class appObject
 public:
 
 	void RenderScene(GLuint uniformModel, GLfloat deltaTime,
-		std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
-					std::vector<std::unique_ptr<Texture>>& textureList,
-					std::vector<std::unique_ptr<Model>>& modelList,
+					std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
+					std::unordered_map<TextureType, std::unique_ptr<Texture>>& textureList,
+					std::unordered_map<ModelType, std::unique_ptr<Model>>& modelList, 
 					std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList);
 
 	void RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-		std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
-					std::vector<std::unique_ptr<Texture>>& textureList,
-					std::vector<std::unique_ptr<Model>>& modelList,
+					std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
+					std::unordered_map<TextureType, std::unique_ptr<Texture>>& textureList,
+					std::unordered_map<ModelType, std::unique_ptr<Model>>& modelList, 
 					std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList,
 					std::vector<std::unique_ptr<DirectionalLight>>& DirectionalLightList,
 				    std::vector<std::unique_ptr<PointLight>>& PointLightList,
