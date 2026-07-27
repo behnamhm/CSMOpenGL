@@ -1,10 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <vector>
 #include <glm/glm.hpp> 
 #include "vertexLayout.h"
+#include "objectTypes.h"
+
+
 
 class Mesh
 {
@@ -13,6 +17,7 @@ public:
     void Create(const std::vector<float>& vertices, const std::vector<uint32_t>& indices);
     void keyControl(bool* keys, GLfloat deltaTime, glm::vec3& sphere_pos, glm::quat& sphere_rot,
         float radius, const glm::vec3& camFront, const glm::vec3& camRight);
+    void DrawObject(std::string& ObjName);
     void DrawFloor();
     void DrawQuad();
     void DrawCube();

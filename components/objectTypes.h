@@ -11,7 +11,9 @@ enum class ShaderType
 	Irradiance,
 	Prefilter,
 	BRDF,
-	ShadowMap
+	ShadowMap,
+	DebugDepthQuad,
+	DebugCascade
 };
 
 enum class MeshType

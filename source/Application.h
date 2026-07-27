@@ -55,24 +55,41 @@ private:
     unsigned int pointLightCount = 0;
     unsigned int captureFBO, captureRBO, envCubemap, hdrTexture, irradianceMap, prefilterMap, brdfLUTTexture;
 
-    void InitShader(ShaderType type)
+    void CreateShader(ShaderType type, const char* vertexLocation, const char* fragmentLocation)
     {
         shaderList.emplace(type, std::make_unique<Shader>());
+        shaderList[type]->CreateFromFiles(vertexLocation, fragmentLocation);
     }
 
-    void InitMesh(MeshType type)
+    void CreateShader(ShaderType type, const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation)
+    {
+        shaderList.emplace(type, std::make_unique<Shader>());
+        shaderList[type]->CreateFromFiles(vertexLocation, geometryLocation, fragmentLocation);
+    }
+
+    void CreateMesh(MeshType type, std::string ObjName)
     {
         meshList.emplace(type, std::make_unique<Mesh>());
+        meshList[type]->DrawObject(ObjName);
     }
 
-    void InitTexture(TextureType type)
+    void CreateTexture(TextureType type, const char* path)
     {
         textureList.emplace(type, std::make_unique<Texture>());
+        *textureList[type] = Texture(path);
+        textureList[type]->LoadTexture();
+    }
+    void CreateTextureA(TextureType type, const char* path)
+    {
+        textureList.emplace(type, std::make_unique<Texture>());
+        *textureList[type] = Texture(path);
+        textureList[type]->LoadTextureA();
     }
 
-    void InitModel(ModelType type)
+    void CreateModel(ModelType type, const std::string& fileName)
     {
         modelList.emplace(type, std::make_unique<Model>());
+        modelList[type]->LoadModel(fileName);
     }
 
 

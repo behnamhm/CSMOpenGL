@@ -7,25 +7,6 @@ void Application::Init()
 
     window.init(appObj, thisWindow);
 
-    InitShader(ShaderType::Main);
-    InitShader(ShaderType::Cubemap);
-    InitShader(ShaderType::Environment);
-    InitShader(ShaderType::Irradiance);
-    InitShader(ShaderType::Prefilter);
-    InitShader(ShaderType::BRDF);
-    InitShader(ShaderType::ShadowMap);
-
-    InitMesh(MeshType::Floor);
-    InitMesh(MeshType::Cube);
-
-    InitTexture(TextureType::Checker);
-    InitTexture(TextureType::SpaceshipMetal);
-    InitTexture(TextureType::CheckerMetal);
-    InitTexture(TextureType::CheckerRoughness);
-
-    InitModel(ModelType::Spaceship);
-
-
 }
 
 void Application::Run()
@@ -34,47 +15,32 @@ void Application::Run()
     Init();
 
     // shaders
-    shaderList[ShaderType::Main]->CreateFromFiles("assets/shaders/vertex.glsl",
-                                                   "assets/shaders/fragment.glsl");
-
-    shaderList[ShaderType::Cubemap]->CreateFromFiles("assets/shaders/cubemapVertex.glsl",
-                                                    "assets/shaders/cubemapFragment.glsl");
-
-    shaderList[ShaderType::Environment]->CreateFromFiles("assets/shaders/environmentVertex.glsl",
-                                                         "assets/shaders/environmentFragment.glsl");
-
-    shaderList[ShaderType::Irradiance]->CreateFromFiles("assets/shaders/cubemapVertex.glsl",
-                                                         "assets/shaders/irradianceConvolutionFragment.glsl");
-
-    shaderList[ShaderType::Prefilter]->CreateFromFiles("assets/shaders/cubemapVertex.glsl",
-                                                    "assets/shaders/prefilterFragment.glsl");
-
-    shaderList[ShaderType::BRDF]->CreateFromFiles("assets/shaders/BRDFVertex.glsl",
-                                                    "assets/shaders/BRDFFragment.glsl");
-
-    shaderList[ShaderType::ShadowMap]->CreateFromFiles("assets/shaders/shadowMappingVertex.glsl",
-                                                        "assets/shaders/shadowMappingGeometry.glsl",
-                                                        "assets/shaders/shadowMappingFragment.glsl");
+    CreateShader(ShaderType::Main, "assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
+    CreateShader(ShaderType::Cubemap, "assets/shaders/cubemapVertex.glsl", "assets/shaders/cubemapFragment.glsl");
+    CreateShader(ShaderType::Environment, "assets/shaders/environmentVertex.glsl", "assets/shaders/environmentFragment.glsl");
+    CreateShader(ShaderType::Irradiance, "assets/shaders/cubemapVertex.glsl", 
+                                        "assets/shaders/irradianceConvolutionFragment.glsl");
+    CreateShader(ShaderType::Prefilter, "assets/shaders/cubemapVertex.glsl", "assets/shaders/prefilterFragment.glsl");
+    CreateShader(ShaderType::BRDF, "assets/shaders/BRDFVertex.glsl", "assets/shaders/BRDFFragment.glsl");
+    CreateShader(ShaderType::ShadowMap, "assets/shaders/shadowMappingVertex.glsl", "assets/shaders/shadowMappingGeometry.glsl",
+                                        "assets/shaders/shadowMappingFragment.glsl");
+    CreateShader(ShaderType::DebugDepthQuad, "assets/shaders/debugDepthQuadVertex.glsl",
+                                            "assets/shaders/debugDepthQuadFragment.glsl");
+    CreateShader(ShaderType::DebugCascade, "assets/shaders/debugCascadeVertex.glsl",
+                                            "assets/shaders/debugCascadeFragment.glsl");
 
     // meshes
-    meshList[MeshType::Floor]->DrawFloor();
-    meshList[MeshType::Cube]->DrawCube();
+    CreateMesh(MeshType::Floor, "Floor");
+    CreateMesh(MeshType::Cube, "Cube");
 
     // textures
-    *textureList[TextureType::Checker] = Texture("assets/textures/checker.png");
-    textureList[TextureType::Checker]->LoadTexture();
-
-    *textureList[TextureType::SpaceshipMetal] = Texture("assets/textures/Intergalactic Spaceship_metalness.jpg");
-    textureList[TextureType::SpaceshipMetal]->LoadTexture();
-
-    *textureList[TextureType::CheckerMetal] = Texture("assets/textures/checkerMetal.png");
-    textureList[TextureType::CheckerMetal]->LoadTextureA();
-
-    *textureList[TextureType::CheckerRoughness] = Texture("assets/textures/checkerRoughness.png");
-    textureList[TextureType::CheckerRoughness]->LoadTextureA();
+    CreateTexture(TextureType::Checker, "assets/textures/checker.png");
+    CreateTexture(TextureType::SpaceshipMetal, "assets/textures/Intergalactic Spaceship_metalness.jpg");
+    CreateTextureA(TextureType::CheckerMetal, "assets/textures/checkerMetal.png");
+    CreateTextureA(TextureType::CheckerRoughness, "assets/textures/checkerRoughness.png");
 
     // models
-    modelList[ModelType::Spaceship]->LoadModel("assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
+    CreateModel(ModelType::Spaceship, "assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
    
     // lights
     DirectionalLightList.push_back(std::make_unique<DirectionalLight>(DirectionalLight(2048, 2048,

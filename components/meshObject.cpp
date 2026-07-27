@@ -47,6 +47,18 @@ void Mesh::Create(const std::vector<float>& vertices, const std::vector<uint32_t
 
 }
 
+void Mesh::DrawObject(std::string& ObjName)
+{
+    if (ObjName == "Floor")
+    {
+        DrawFloor();
+    }
+    else if (ObjName == "Cube")
+    {
+        DrawCube();
+    }
+}
+
 
 void Mesh::DrawFloor()
 {
