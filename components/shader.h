@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 
 #include <GL\glew.h>
 
@@ -24,6 +25,7 @@ public:
 
 	void CreateFromString(const char* vertexCode, const char* fragmentCode);
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
+	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 
 	void Validate();
 
@@ -64,6 +66,7 @@ public:
 	void SetBrdfLUT(int value);
 	void SetProjection(glm::mat4& projectionMatrix);
 	void SetView(glm::mat4& viewMatrix);
+
 
 	void UseShader();
 	void ClearShader();

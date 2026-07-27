@@ -25,6 +25,19 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* fragmentLoc
 	CompileShader(vertexCode, fragmentCode);
 }
 
+void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation)
+{
+	std::string vertexString = ReadFile(vertexLocation);
+	std::string geometryString = ReadFile(geometryLocation);
+	std::string fragmentString = ReadFile(fragmentLocation);
+	const char* vertexCode = vertexString.c_str();
+	const char* geometryCode = geometryString.c_str();
+	const char* fragmentCode = fragmentString.c_str();
+
+	CompileShader(vertexCode, geometryCode, fragmentCode);
+}
+
+
 GLuint Shader::GetUseTextureLocation()
 {
 	return glGetUniformLocation(shaderID, "textureUse");

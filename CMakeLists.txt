@@ -31,6 +31,7 @@ set(PROJECT_SOURCE_FILES
   components/Model.cpp
   components/window.h
   components/window.cpp
+  components/objectTypes.h
   lights/shadowMap.h 
   lights/shadowMap.cpp 
   lights/directionalLight.h 

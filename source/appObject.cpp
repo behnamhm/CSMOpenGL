@@ -2,10 +2,10 @@
 
 
 void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
-                            std::vector<std::unique_ptr<Mesh>>& meshList,
+                            std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
                             std::vector<std::unique_ptr<Texture>>& textureList,
                             std::vector<std::unique_ptr<Model>>& modelList,
-                            std::vector<std::unique_ptr<Shader>>& shaderList)
+                            std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList)
 {
     // floor
     glm::mat4 floor_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -16,15 +16,15 @@ void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
     textureList[0]->UseTexture(GL_TEXTURE7);
     textureList[2]->UseTexture(GL_TEXTURE10);
     textureList[3]->UseTexture(GL_TEXTURE9);      
-    shaderList[0]->SetTexture(7);
-    meshList[0]->Draw();
+    shaderList.at(ShaderType::Main)->SetTexture(7);
+    meshList.at(MeshType::Floor)->Draw();
 
     // external model
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
     textureList[1]->UseTexture(GL_TEXTURE10);
-    shaderList[0]->SetTexture(8);
+    shaderList.at(ShaderType::Main)->SetTexture(8);
     
     modelList[0]->RenderModel();
 
@@ -32,10 +32,10 @@ void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime,
 }
 
 void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-                            std::vector<std::unique_ptr<Mesh>>& meshList,
+                            std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
                             std::vector<std::unique_ptr<Texture>>& textureList,
                             std::vector<std::unique_ptr<Model>>& modelList,
-                            std::vector<std::unique_ptr<Shader>>& shaderList,
+                            std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList,
                             std::vector<std::unique_ptr<DirectionalLight>>& DirectionalLightList,
                             std::vector<std::unique_ptr<PointLight>>& PointLightList,
                             unsigned int& envCubemap, unsigned int& irradianceMap,
@@ -50,23 +50,23 @@ void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
 
     // environment cube map
     glm::mat4 viewMatrix = glm::mat4(glm::mat3(camera_view));
-    shaderList[2]->UseShader();
-    shaderList[2]->SetView(viewMatrix);
-    shaderList[2]->SetProjection(projectionMatrix);
+    shaderList[ShaderType::Environment]->UseShader();
+    shaderList[ShaderType::Environment]->SetView(viewMatrix);
+    shaderList[ShaderType::Environment]->SetProjection(projectionMatrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
-    meshList[1]->Draw();
+    meshList.at(MeshType::Cube)->Draw();
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
     // set scene data
-    shaderList[0]->UseShader();
-    uniformModel = shaderList[0]->GetModelLocation();
-    uniformEyePosition = shaderList[0]->GetEyePositionLocation();
-    uniformProjection = shaderList[0]->GetProjectionLocation();
-    uniformView = shaderList[0]->GetViewLocation();
+    shaderList.at(ShaderType::Main)->UseShader();
+    uniformModel = shaderList.at(ShaderType::Main)->GetModelLocation();
+    uniformEyePosition = shaderList.at(ShaderType::Main)->GetEyePositionLocation();
+    uniformProjection = shaderList.at(ShaderType::Main)->GetProjectionLocation();
+    uniformView = shaderList.at(ShaderType::Main)->GetViewLocation();
     // bind irradianceMap
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
@@ -80,12 +80,12 @@ void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
     glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera_view));
     glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-    shaderList[0]->SetDirectionalLight(&*DirectionalLightList[0]);
-    shaderList[0]->SetPointLights(PointLightList, 2, 3, 0);
+    shaderList.at(ShaderType::Main)->SetDirectionalLight(&*DirectionalLightList[0]);
+    shaderList.at(ShaderType::Main)->SetPointLights(PointLightList, 2, 3, 0);
     glm::mat4 lightTransform = DirectionalLightList[0]->CalculateLightTransform();
-    shaderList[0]->SetDirectionalLightTransform(&lightTransform);
+    shaderList.at(ShaderType::Main)->SetDirectionalLightTransform(&lightTransform);
 
-    shaderList[0]->Validate();
+    shaderList.at(ShaderType::Main)->Validate();
 
     // render
     RenderScene(uniformModel, deltaTime, meshList, textureList, modelList, shaderList);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 
 
@@ -14,22 +15,24 @@
 #include "components/camera.h"
 #include "components/Skybox.h"
 #include "components/Model.h"
+#include "components/objectTypes.h"
 
 
 class appObject
 {
 public:
+
 	void RenderScene(GLuint uniformModel, GLfloat deltaTime,
-					std::vector<std::unique_ptr<Mesh>> &meshList,
+		std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
 					std::vector<std::unique_ptr<Texture>>& textureList,
 					std::vector<std::unique_ptr<Model>>& modelList,
-					std::vector<std::unique_ptr<Shader>>& shaderList);
+					std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList);
 
 	void RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-					std::vector<std::unique_ptr<Mesh>>& meshList,
+		std::unordered_map<MeshType, std::unique_ptr<Mesh>>& meshList,
 					std::vector<std::unique_ptr<Texture>>& textureList,
 					std::vector<std::unique_ptr<Model>>& modelList,
-					std::vector<std::unique_ptr<Shader>> &shaderList, 
+					std::unordered_map<ShaderType, std::unique_ptr<Shader>>& shaderList,
 					std::vector<std::unique_ptr<DirectionalLight>>& DirectionalLightList,
 				    std::vector<std::unique_ptr<PointLight>>& PointLightList,
 					unsigned int& envCubemap, unsigned int& irradianceMap,
@@ -43,6 +46,7 @@ public:
 	Camera camera;
 
 	GLuint uniformProjection{ 0 }, uniformModel{ 0 }, uniformView{ 0 }, uniformEyePosition{ 0 };
+
 
 
 };
