@@ -44,19 +44,19 @@ void Application::Run()
     CreateModel(ModelType::Spaceship, "assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
    
     // lights
-    DirectionalLightList.push_back(std::make_unique<DirectionalLight>(DirectionalLight(2048, 2048,
+    appObj.DirectionalLightList.push_back(std::make_unique<DirectionalLight>(DirectionalLight(2048, 2048,
                                                                                     1.0f, 1.0f, 1.0f,
                                                                                     0.5f, 3.5f, 
                                                                                     -0.5f,-5.0f, -2.5f)));
 
-    PointLightList.push_back(std::make_unique<PointLight>(PointLight(1024, 1024,
+    appObj.PointLightList.push_back(std::make_unique<PointLight>(PointLight(1024, 1024,
                                                             0.01f, 200.0f,
                                                             1.0f, 1.0f, 1.0f,
                                                             0.5f, 3.5f, 
                                                             4.0f, 5.0f, 2.0f, 
                                                             1.0f, 0.09f, 0.132f)));
 
-    PointLightList.push_back(std::make_unique<PointLight>(PointLight(1024, 1024,
+    appObj.PointLightList.push_back(std::make_unique<PointLight>(PointLight(1024, 1024,
                                                             0.01f, 200.0f, 
                                                             1.0f, 1.0f, 1.0f, 
                                                             0.5f, 3.5f, 
@@ -78,19 +78,19 @@ void Application::Run()
     Buffer.SetupCubeMap(envCubemap);
 
     // Capture framebuffer
-    Buffer.CaptureFrameBuffer(*shaderList[ShaderType::Cubemap], *meshList.at(MeshType::Cube), captureFBO, captureRBO, hdrTexture, envCubemap,
+    Buffer.CaptureFrameBuffer(*appObj.shaderList[ShaderType::Cubemap], *appObj.meshList.at(MeshType::Cube), captureFBO, captureRBO, hdrTexture, envCubemap,
                                   captureProjection, captureViews);
 
     // Irradiance Map framebuffer
-    Buffer.IrradianceFrameBuffer(*shaderList[ShaderType::Irradiance], *meshList.at(MeshType::Cube), captureFBO, captureRBO, irradianceMap, envCubemap,
+    Buffer.IrradianceFrameBuffer(*appObj.shaderList[ShaderType::Irradiance], *appObj.meshList.at(MeshType::Cube), captureFBO, captureRBO, irradianceMap, envCubemap,
                                    captureProjection, captureViews);
 
     // Prefilter framebuffer
-    Buffer.PrefilterFrameBuffer(*shaderList[ShaderType::Prefilter], *meshList.at(MeshType::Cube), captureFBO, captureRBO, prefilterMap, envCubemap,
+    Buffer.PrefilterFrameBuffer(*appObj.shaderList[ShaderType::Prefilter], *appObj.meshList.at(MeshType::Cube), captureFBO, captureRBO, prefilterMap, envCubemap,
                                    captureProjection, captureViews);
 
     // brdfLUT framebuffer
-    Buffer.BRDFLutFrameBuffer(*shaderList[ShaderType::BRDF], *meshList.at(MeshType::Cube), captureFBO, captureRBO, brdfLUTTexture);
+    Buffer.BRDFLutFrameBuffer(*appObj.shaderList[ShaderType::BRDF], *appObj.meshList.at(MeshType::Cube), captureFBO, captureRBO, brdfLUTTexture);
 
     // Light depth framebuffer
     Buffer.LightDepthMapBuffer(lightFBO,  lightDepthMaps, depthMapResolution, shadowCascadeLevels);
@@ -100,20 +100,20 @@ void Application::Run()
 
 
     // set uniform values
-    shaderList[ShaderType::Main]->UseShader();
-    shaderList[ShaderType::Main]->SetProjection(projectionMatrix);
-    shaderList[ShaderType::Main]->SetView(camera_view);
-    shaderList[ShaderType::Main]->SetIrradianceMap(0);
-    shaderList[ShaderType::Main]->SetPrefilterMap(1);
-    shaderList[ShaderType::Main]->SetBrdfLUT(2);
-    shaderList[ShaderType::Main]->SetShadowMp(3);
-    shaderList[ShaderType::Main]->SetRoughnessMap(9);
-    shaderList[ShaderType::Main]->SetMetalMap(10);
+    appObj.shaderList[ShaderType::Main]->UseShader();
+    appObj.shaderList[ShaderType::Main]->SetProjection(projectionMatrix);
+    appObj.shaderList[ShaderType::Main]->SetView(camera_view);
+    appObj.shaderList[ShaderType::Main]->SetIrradianceMap(0);
+    appObj.shaderList[ShaderType::Main]->SetPrefilterMap(1);
+    appObj.shaderList[ShaderType::Main]->SetBrdfLUT(2);
+    appObj.shaderList[ShaderType::Main]->SetShadowMp(3);
+    appObj.shaderList[ShaderType::Main]->SetRoughnessMap(9);
+    appObj.shaderList[ShaderType::Main]->SetMetalMap(10);
 
 
-    shaderList[ShaderType::Environment]->UseShader();
-    shaderList[ShaderType::Environment]->SetEnvironmentMap(0);
-    shaderList[ShaderType::Environment]->SetProjection(projectionMatrix);
+    appObj.shaderList[ShaderType::Environment]->UseShader();
+    appObj.shaderList[ShaderType::Environment]->SetEnvironmentMap(0);
+    appObj.shaderList[ShaderType::Environment]->SetProjection(projectionMatrix);
 
 
     while (!glfwWindowShouldClose(thisWindow))
@@ -123,7 +123,7 @@ void Application::Run()
         lastTime = now;
 
         glfwPollEvents();
-        appObj.inputManager.processInput(*shaderList[ShaderType::Main], thisWindow);
+        appObj.inputManager.processInput(*appObj.shaderList[ShaderType::Main], thisWindow);
         appObj.processInput(thisWindow, shadowCascadeLevels);
         appObj.camera.keyControl(appObj.inputManager.getsKeys(), deltaTime);
         appObj.camera.mouseControl(appObj.inputManager.getXChange(), appObj.inputManager.getYChange());
@@ -131,15 +131,14 @@ void Application::Run()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // render passes
         appObj.ShadowPass(appObj.camera.calculateViewMatrix(), projectionMatrix, deltaTime,
-                        meshList, textureList, modelList, shaderList,
-                        DirectionalLightList, PointLightList, envCubemap, irradianceMap,
+                         envCubemap, irradianceMap,
                         prefilterMap, brdfLUTTexture, lightFBO, depthMapResolution, 
                          shadowCascadeLevels, matricesUBO, cameraNearPlane, cameraFarPlane);
 
         appObj.RenderPass(appObj.camera.calculateViewMatrix(), projectionMatrix, deltaTime, 
-                            meshList, textureList, modelList, shaderList, 
-                            DirectionalLightList, PointLightList, envCubemap, irradianceMap,
+                            envCubemap, irradianceMap,
                             prefilterMap, brdfLUTTexture, shadowCascadeLevels, lightDepthMaps);
 
         glfwSwapBuffers(thisWindow);
@@ -147,6 +146,4 @@ void Application::Run()
 
     glfwTerminate();
 }
-
-
 
