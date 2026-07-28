@@ -4,7 +4,10 @@
 int main()
 {
     Application App;
-    App.Run();
+    if (App.Init(1920, 1080))
+    {
+       App.Run();
+    }
 
     return 0;
 }

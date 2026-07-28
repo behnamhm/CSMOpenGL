@@ -4,14 +4,14 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "source/appObject.h"
+#include "scene/Scene.h"
 
 class Window
 {
 public:
 	Window();
 
-	bool init( appObject& appObj, GLFWwindow*& thisWindow);
+	bool init(Scene& scene, GLFWwindow*& thisWindow, int width, int height);
 
 	~Window();
 

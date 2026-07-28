@@ -1,36 +1,34 @@
 #include "appObject.h"
+#include "scene/Scene.h"
 
 
-void appObject::RenderScene(GLuint uniformModel, GLfloat deltaTime)
+void appObject::RenderScene(Scene& scene, GLuint uniformModel, GLfloat deltaTime)
 {
     // floor
     glm::mat4 floor_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     floor_model *= glm::mat4_cast(glm::angleAxis(glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
     floor_model = glm::scale(floor_model, glm::vec3(2.0f, 1.0f, 2.0f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(floor_model));
-    textureList.at(TextureType::Checker)->UseTexture(GL_TEXTURE7);
-    textureList.at(TextureType::CheckerMetal)->UseTexture(GL_TEXTURE10);
-    textureList.at(TextureType::CheckerRoughness)->UseTexture(GL_TEXTURE9);
-    shaderList.at(ShaderType::Main)->SetTexture(7);
-    meshList.at(MeshType::Floor)->Render();
+    scene.textureList.at(TextureType::Checker)->UseTexture(GL_TEXTURE7);
+    scene.textureList.at(TextureType::CheckerMetal)->UseTexture(GL_TEXTURE10);
+    scene.textureList.at(TextureType::CheckerRoughness)->UseTexture(GL_TEXTURE9);
+    scene.shaderList.at(ShaderType::Main)->SetTexture(7);
+    scene.meshList.at(MeshType::Floor)->Render();
 
     // external model
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-    textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
-    shaderList.at(ShaderType::Main)->SetTexture(8);
-    modelList.at(ModelType::Spaceship)->RenderModel();
-
+    scene.textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
+    scene.shaderList.at(ShaderType::Main)->SetTexture(8);
+    scene.modelList.at(ModelType::Spaceship)->RenderModel();
 
 }
 
-void appObject::ShadowPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-                            unsigned int& envCubemap, unsigned int& irradianceMap,
-                            unsigned int& prefilterMap, unsigned int& brdfLUTTexture, unsigned int& lightFBO, 
+void appObject::ShadowPass(Scene& scene, GLfloat deltaTime, unsigned int& lightFBO,
                             unsigned int& depthMapResolution,std::vector<float>& shadowCascadeLevels, 
-                            unsigned int& matricesUBO, float& cameraNearPlane, float& cameraFarPlane)
+                            unsigned int& matricesUBO)
 {
-    const auto lightMatrices = getLightSpaceMatrices(shadowCascadeLevels, cameraNearPlane, cameraNearPlane);
+    const auto lightMatrices = getLightSpaceMatrices(scene, shadowCascadeLevels, scene.cameraNearPlane, scene.cameraNearPlane);
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
     for (size_t i = 0; i < lightMatrices.size(); ++i)
     {
@@ -38,7 +36,7 @@ void appObject::ShadowPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
     }
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    shaderList.at(ShaderType::ShadowMap)->UseShader();
+    scene.shaderList.at(ShaderType::ShadowMap)->UseShader();
     glBindFramebuffer(GL_FRAMEBUFFER, lightFBO);
     glViewport(0, 0, depthMapResolution, depthMapResolution);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -47,17 +45,17 @@ void appObject::ShadowPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
     glViewport(0, 0, fb_width, fb_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    uniformModel = shaderList.at(ShaderType::ShadowMap)->GetModelLocation();
+    uniformModel = scene.shaderList.at(ShaderType::ShadowMap)->GetModelLocation();
 
-    shaderList.at(ShaderType::ShadowMap)->Validate();
+    scene.shaderList.at(ShaderType::ShadowMap)->Validate();
 
-    RenderScene(uniformModel, deltaTime);
+    RenderScene(scene, uniformModel, deltaTime);
     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
 
-void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
+void appObject::RenderPass(Scene& scene, GLfloat deltaTime,
                              unsigned int& envCubemap, unsigned int& irradianceMap,
                             unsigned int& prefilterMap, unsigned int& brdfLUTTexture,
                             std::vector<float> &shadowCascadeLevels, unsigned int& lightDepthMaps)
@@ -69,24 +67,24 @@ void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // environment cube map
-    glm::mat4 viewMatrix = glm::mat4(glm::mat3(camera_view));
-    shaderList[ShaderType::Environment]->UseShader();
-    shaderList[ShaderType::Environment]->SetView(viewMatrix);
-    shaderList[ShaderType::Environment]->SetProjection(projectionMatrix);
+    glm::mat4 viewMatrix = glm::mat4(glm::mat3(scene.camera.calculateViewMatrix()));
+    scene.shaderList[ShaderType::Environment]->UseShader();
+    scene.shaderList[ShaderType::Environment]->SetView(viewMatrix);
+    scene.shaderList[ShaderType::Environment]->SetProjection(scene.projectionMatrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
-    meshList.at(MeshType::Cube)->Render();
+    scene.meshList.at(MeshType::Cube)->Render();
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 
     // set scene data
-    shaderList.at(ShaderType::Main)->UseShader();
-    uniformModel = shaderList.at(ShaderType::Main)->GetModelLocation();
-    uniformEyePosition = shaderList.at(ShaderType::Main)->GetEyePositionLocation();
-    uniformProjection = shaderList.at(ShaderType::Main)->GetProjectionLocation();
-    uniformView = shaderList.at(ShaderType::Main)->GetViewLocation();
+    scene.shaderList.at(ShaderType::Main)->UseShader();
+    uniformModel = scene.shaderList.at(ShaderType::Main)->GetModelLocation();
+    uniformEyePosition = scene.shaderList.at(ShaderType::Main)->GetEyePositionLocation();
+    uniformProjection = scene.shaderList.at(ShaderType::Main)->GetProjectionLocation();
+    uniformView = scene.shaderList.at(ShaderType::Main)->GetViewLocation();
     // bind irradianceMap
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
@@ -96,50 +94,50 @@ void appObject::RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GL
     glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
-    glm::vec3 camera_pos = camera.getCameraPosition();
+    glm::vec3 camera_pos = scene.camera.getCameraPosition();
     glUniform3f(uniformEyePosition, camera_pos.x, camera_pos.y, camera_pos.z);
-    glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera_view));
-    glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(scene.camera.calculateViewMatrix()));
+    glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(scene.projectionMatrix));
 
-    shaderList.at(ShaderType::Main)->SetView(camera_view);
-    shaderList.at(ShaderType::Main)->SetDirectionalLight(&*DirectionalLightList[0]);
-    shaderList.at(ShaderType::Main)->SetPointLights(PointLightList, 2, 3, 0);
-    glm::mat4 lightTransform = DirectionalLightList[0]->CalculateLightTransform();
-    shaderList.at(ShaderType::Main)->SetDirectionalLightTransform(&lightTransform);
-    shaderList.at(ShaderType::Main)->SetCascadeCount(shadowCascadeLevels.size());
+    scene.shaderList.at(ShaderType::Main)->SetView(scene.camera.calculateViewMatrix());
+    scene.shaderList.at(ShaderType::Main)->SetDirectionalLight(&*scene.DirectionalLightList[0]);
+    scene.shaderList.at(ShaderType::Main)->SetPointLights(scene.PointLightList, 2, 3, 0);
+    glm::mat4 lightTransform = scene.DirectionalLightList[0]->CalculateLightTransform();
+    scene.shaderList.at(ShaderType::Main)->SetDirectionalLightTransform(&lightTransform);
+    scene.shaderList.at(ShaderType::Main)->SetCascadeCount(shadowCascadeLevels.size());
     for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
     {
-        shaderList.at(ShaderType::Main)->SetCascadeDistance("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+        scene.shaderList.at(ShaderType::Main)->SetCascadeDistance("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }
 
-    shaderList.at(ShaderType::Main)->Validate();
+    scene.shaderList.at(ShaderType::Main)->Validate();
 
     // render
-    RenderScene(uniformModel, deltaTime);
+    RenderScene(scene, uniformModel, deltaTime);
 
     // debug
     if (lightMatricesCache.size() != 0)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        shaderList[ShaderType::DebugCascade]->UseShader();
-        shaderList[ShaderType::DebugCascade]->SetProjection(projectionMatrix);
-        shaderList[ShaderType::DebugCascade]->SetView(camera_view);
-        drawCascadeVolumeVisualizers(lightMatricesCache, &*shaderList[ShaderType::DebugCascade]);
+        scene.shaderList[ShaderType::DebugCascade]->UseShader();
+        scene.shaderList[ShaderType::DebugCascade]->SetProjection(scene.projectionMatrix);
+        scene.shaderList[ShaderType::DebugCascade]->SetView(scene.camera.calculateViewMatrix());
+        drawCascadeVolumeVisualizers(lightMatricesCache, &*scene.shaderList[ShaderType::DebugCascade]);
         glDisable(GL_BLEND);
     }
 
-    shaderList[ShaderType::DebugDepthQuad]->UseShader();
-    shaderList[ShaderType::DebugDepthQuad]->SetLayer(debugLayer);
+    scene.shaderList[ShaderType::DebugDepthQuad]->UseShader();
+    scene.shaderList[ShaderType::DebugDepthQuad]->SetLayer(debugLayer);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
     if (showQuad)
     {
-        meshList[MeshType::Quad]->DrawQuad();
+        scene.meshList[MeshType::Quad]->DrawQuad();
     }
 }
 
-std::vector<glm::mat4> appObject::getLightSpaceMatrices(std::vector<float>& shadowCascadeLevels, 
+std::vector<glm::mat4> appObject::getLightSpaceMatrices(Scene& scene, std::vector<float>& shadowCascadeLevels,
                                                     float& cameraNearPlane, float& cameraFarPlane)
 {
     std::vector<glm::mat4> ret;
@@ -147,26 +145,26 @@ std::vector<glm::mat4> appObject::getLightSpaceMatrices(std::vector<float>& shad
     {
         if (i == 0)
         {
-            ret.push_back(getLightSpaceMatrix(cameraNearPlane, shadowCascadeLevels[i]));
+            ret.push_back(getLightSpaceMatrix(scene, cameraNearPlane, shadowCascadeLevels[i]));
         }
         else if (i < shadowCascadeLevels.size())
         {
-            ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], shadowCascadeLevels[i]));
+            ret.push_back(getLightSpaceMatrix(scene, shadowCascadeLevels[i - 1], shadowCascadeLevels[i]));
         }
         else
         {
-            ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], cameraFarPlane));
+            ret.push_back(getLightSpaceMatrix(scene, shadowCascadeLevels[i - 1], cameraFarPlane));
         }
     }
     return ret;
 }
 
-glm::mat4 appObject::getLightSpaceMatrix(const float nearPlane, const float farPlane)
+glm::mat4 appObject::getLightSpaceMatrix(Scene& scene, const float nearPlane, const float farPlane)
 {
     const auto proj = glm::perspective(
         glm::radians(90.0f), (float)fb_width / (float)fb_height, nearPlane,
         farPlane);
-    const auto corners = getFrustumCornersWorldSpace(proj, camera.calculateViewMatrix());
+    const auto corners = getFrustumCornersWorldSpace(proj, scene.camera.calculateViewMatrix());
 
     glm::vec3 center = glm::vec3(0, 0, 0);
     for (const auto& v : corners)
@@ -311,7 +309,7 @@ void appObject::drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& light
 }
 
 
-void appObject::processInput(GLFWwindow* window, std::vector<float>& shadowCascadeLevels)
+void appObject::processInput(Scene& scene, GLFWwindow* window, std::vector<float>& shadowCascadeLevels)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -339,7 +337,7 @@ void appObject::processInput(GLFWwindow* window, std::vector<float>& shadowCasca
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE && cPress == GLFW_PRESS)
     {
 
-        lightMatricesCache = getLightSpaceMatrices(shadowCascadeLevels,
+        lightMatricesCache = getLightSpaceMatrices(scene, shadowCascadeLevels,
             cameraNear, cameraFar);
     }
     cPress = glfwGetKey(window, GLFW_KEY_C);

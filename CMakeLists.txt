@@ -14,6 +14,8 @@ set(PROJECT_SOURCE_FILES
   source/Application.cpp
   source/appObject.h
   source/appObject.cpp
+  scene/Scene.h
+  scene/Scene.cpp
   components/shader.cpp
   components/shader.h
   components/inputManager.cpp

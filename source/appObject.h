@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <memory>
 
-
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
@@ -16,59 +15,44 @@
 #include "components/camera.h"
 #include "components/Skybox.h"
 #include "components/Model.h"
-#include "components/objectTypes.h"
 
+
+class Scene;
 
 class appObject
 {
 public:
 
-	void RenderScene(GLuint uniformModel, GLfloat deltaTime);
+	void RenderScene(Scene& scene, GLuint uniformModel, GLfloat deltaTime);
 
-	void RenderPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-					
+	void RenderPass(Scene& scene, GLfloat deltaTime,
 					unsigned int& envCubemap, unsigned int& irradianceMap,
 					unsigned int&  prefilterMap, unsigned int& brdfLUTTexture,
 					std::vector<float>& shadowCascadeLevels, unsigned int& lightDepthMaps);
 
-	void ShadowPass(glm::mat4 camera_view, glm::mat4 projectionMatrix, GLfloat deltaTime,
-					
-					unsigned int& envCubemap, unsigned int& irradianceMap,
-					unsigned int& prefilterMap, unsigned int& brdfLUTTexture, unsigned int& lightFBO, 
+	void ShadowPass(Scene& scene, GLfloat deltaTime, unsigned int& lightFBO,
 					unsigned int& depthMapResolution, std::vector<float>& shadowCascadeLevels,
-					unsigned int& matricesUBO, float& cameraNearPlane, float& cameraFarPlane);
+					unsigned int& matricesUBO);
 
-	std::vector<glm::mat4> getLightSpaceMatrices(std::vector<float>& shadowCascadeLevels, 
+	void drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& lightMatrices, Shader* shader);
+	void processInput(Scene& scene, GLFWwindow* window, std::vector<float>& shadowCascadeLevels);
+	std::vector<glm::mat4> getLightSpaceMatrices(Scene& scene, std::vector<float>& shadowCascadeLevels,
 													float& cameraNearPlane, float& cameraFarPlane);
-	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
+	glm::mat4 getLightSpaceMatrix(Scene& scene, const float nearPlane, const float farPlane);
 	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
   	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
-	void drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& lightMatrices, Shader* shader);
-	void processInput(GLFWwindow* window, std::vector<float>& shadowCascadeLevels);
-
-
-	glm::vec3 sphere_phys_pos;
-	glm::quat sphere_phys_rot;
-	InputManager inputManager;
-	Camera camera;
 
 	GLuint uniformProjection{ 0 }, uniformModel{ 0 }, uniformView{ 0 }, uniformEyePosition{ 0 };
+	std::vector<glm::mat4> lightMatricesCache;
+	std::vector<GLuint> visualizerVAOs;
+	std::vector<GLuint> visualizerVBOs;
+	std::vector<GLuint> visualizerEBOs;
 
 	int fb_width;
 	int fb_height;
 	int debugLayer = 0;
 	bool showQuad = false;
-	std::vector<glm::mat4> lightMatricesCache;
-	std::vector<GLuint> visualizerVAOs;
-	std::vector<GLuint> visualizerVBOs;
-	std::vector<GLuint> visualizerEBOs;
 	float cameraNear = 0.1f;
 	float cameraFar = 500.0f;
-	std::unordered_map<ShaderType, std::unique_ptr<Shader>> shaderList;
-	std::unordered_map<MeshType, std::unique_ptr<Mesh>> meshList;
-	std::unordered_map<TextureType, std::unique_ptr<Texture>> textureList;
-	std::unordered_map<ModelType, std::unique_ptr<Model>> modelList;
-	std::vector<std::unique_ptr<DirectionalLight>> DirectionalLightList;
-	std::vector<std::unique_ptr<PointLight>> PointLightList;
-	std::vector<std::string> faces;
+
 };

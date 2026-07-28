@@ -5,7 +5,7 @@ Window::Window()
 
 }
 
-bool Window::init(appObject &appObj, GLFWwindow*& thisWindow)
+bool Window::init(Scene& scene, GLFWwindow*& thisWindow, int width, int height)
 {
     if (!glfwInit())
     {
@@ -18,7 +18,7 @@ bool Window::init(appObject &appObj, GLFWwindow*& thisWindow)
 
 
 
-    thisWindow = glfwCreateWindow(1920, 1080, "IBL App", nullptr, nullptr);
+    thisWindow = glfwCreateWindow(width, height, "IBL App", nullptr, nullptr);
 
     if (thisWindow == nullptr)
     {
@@ -27,7 +27,7 @@ bool Window::init(appObject &appObj, GLFWwindow*& thisWindow)
         return -1;
     }
 
-    appObj.inputManager.SetCallback(thisWindow);
+    scene.inputManager.SetCallback(thisWindow);
 
 
     //glfwSetWindowPos(window, 2000, 150);
