@@ -144,7 +144,7 @@ void InputManager::processInput(Shader &shader, GLFWwindow* window)
     }
     shader.SetMetallic(std::min(metallicVal, 1.0f));
     shader.SetRoughness(std::min(roughnessVal, 1.0f));
-    
+
 
 }
 

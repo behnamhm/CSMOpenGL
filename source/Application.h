@@ -93,12 +93,5 @@ private:
         modelList.emplace(type, std::make_unique<Model>());
         modelList[type]->LoadModel(fileName);
     }
-    std::vector<glm::mat4> getLightSpaceMatrices();
-    std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
-    glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
-    std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
-    const glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 20.0f));
-    // framebuffer size
-    int fb_width;
-    int fb_height;
+
 };

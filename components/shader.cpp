@@ -102,6 +102,19 @@ void Shader::SetShadowMp(int value)
 
 }
 
+void Shader::SetLayer(int value)
+{
+	GLint location = glGetUniformLocation(shaderID, "layer");
+	glUniform1i(location, value);
+
+}
+
+void Shader::SetColors(const glm::vec4& value)
+{
+	glUniform4fv(glGetUniformLocation(shaderID, "color"), 1, &value[0]);
+}
+
+
 void Shader::SetProjection(glm::mat4& projectionMatrix)
 {
 	GLint location = glGetUniformLocation(shaderID, "projection");

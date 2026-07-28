@@ -66,6 +66,8 @@ public:
 	void SetIrradianceMap(int value);
 	void SetPrefilterMap(int value);
 	void SetShadowMp(int value);
+	void SetLayer(int value);
+	void SetColors(const glm::vec4& value);
 	void SetBrdfLUT(int value);
 	void SetProjection(glm::mat4& projectionMatrix);
 	void SetView(glm::mat4& viewMatrix);

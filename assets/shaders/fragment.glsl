@@ -64,7 +64,7 @@ uniform int cascadeCount;
 uniform vec3 albedo = vec3(0.2, 0.2, 0.2);   
 uniform float metallic;
 uniform float roughness;
-uniform float ao = 0.1;
+uniform float ao = 0.2;
 
  uniform mat4 view;
 
@@ -311,10 +311,9 @@ void main()
 
     float gamma = 2.2;
 	colour =  finalColour * texColor;
-    /*
+
 	vec3 hdr = colour.rgb;
 	hdr = hdr / (hdr + vec3(1.0));
 	colour.rgb = pow(hdr, vec3(1.0/gamma));
-    */
-     colour.rgb = pow(colour.rgb, vec3(1.0 / gamma));
+
 }

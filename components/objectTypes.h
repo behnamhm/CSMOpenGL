@@ -19,7 +19,8 @@ enum class ShaderType
 enum class MeshType
 {
 	Floor,
-	Cube
+	Cube,
+	Quad
 };
 
 enum class TextureType
