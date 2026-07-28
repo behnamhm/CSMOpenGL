@@ -95,6 +95,13 @@ void Shader::SetBrdfLUT(int value)
 
 }
 
+void Shader::SetShadowMp(int value)
+{
+	GLint location = glGetUniformLocation(shaderID, "shadowMap");
+	glUniform1i(location, value);
+
+}
+
 void Shader::SetProjection(glm::mat4& projectionMatrix)
 {
 	GLint location = glGetUniformLocation(shaderID, "projection");
@@ -367,6 +374,17 @@ void Shader::SetMetalMap(GLuint textureUnit)
 {
 	GLint location = glGetUniformLocation(shaderID, "metallicMap");
 	glUniform1i(location, textureUnit);
+}
+
+void Shader::SetCascadeCount(GLuint textureUnit)
+{
+	GLint location = glGetUniformLocation(shaderID, "cascadeCount");
+	glUniform1i(location, textureUnit);
+}
+
+void Shader::SetCascadeDistance(const std::string& name, float value)
+{
+	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
 }
 
 

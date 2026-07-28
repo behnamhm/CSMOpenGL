@@ -22,7 +22,7 @@ public:
     void DrawQuad();
     void DrawCube();
 
-    void Draw();
+    void Render();
 
     GLuint CreateVertexBuffer(const std::vector<float>& vertices);
     GLuint CreateIndexBuffer(const std::vector<uint32_t>& indices);

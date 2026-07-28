@@ -17,7 +17,7 @@ void Model::RenderModel()
 		if (mat.specular)
 			mat.specular->UseTexture(GL_TEXTURE9);
 
-		meshList[i]->Draw();
+		meshList[i]->Render();
 	}
 }
 

@@ -172,7 +172,7 @@ float Mesh::GetRadius()
     return radius;
 }
 
-void Mesh::Draw()
+void Mesh::Render()
 {
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);

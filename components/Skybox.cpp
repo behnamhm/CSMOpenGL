@@ -63,7 +63,7 @@ void Skybox::DrawSkybox(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 
 	skyShader->Validate();
 
-	skyMesh.Draw();
+	skyMesh.Render();
 
 	glDepthMask(GL_TRUE);
 }

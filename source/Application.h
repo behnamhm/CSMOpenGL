@@ -13,13 +13,11 @@
 #include "lights/PointLight.h"
 
 
-
 class Application
 {
 public:
     void Init();
     void Run();
-    ~Application();
 
 private:
 
@@ -38,10 +36,12 @@ private:
                                             cameraFarPlane / 10.0f, 
                                             cameraFarPlane / 2.0f };
 
-     glm::mat4 captureProjection;
+
+
+    glm::mat4 captureProjection;
     std::vector<glm::mat4> captureViews;
     appObject appObj;
-    Texture BufferTex;
+    Buffer Buffer;
     Skybox skybox;
     DirectionalLight mainLight;
     GLfloat deltaTime = 0.0f;
@@ -53,7 +53,9 @@ private:
     int width = 0;
     int height = 0;
     unsigned int pointLightCount = 0;
-    unsigned int captureFBO, captureRBO, envCubemap, hdrTexture, irradianceMap, prefilterMap, brdfLUTTexture;
+    unsigned int depthMapResolution = 4096;
+    unsigned int captureFBO, captureRBO, envCubemap, hdrTexture, irradianceMap, 
+                prefilterMap, brdfLUTTexture, matricesUBO, lightFBO, lightDepthMaps;
 
     void CreateShader(ShaderType type, const char* vertexLocation, const char* fragmentLocation)
     {
@@ -91,6 +93,12 @@ private:
         modelList.emplace(type, std::make_unique<Model>());
         modelList[type]->LoadModel(fileName);
     }
-
-
+    std::vector<glm::mat4> getLightSpaceMatrices();
+    std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
+    glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
+    std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
+    const glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 20.0f));
+    // framebuffer size
+    int fb_width;
+    int fb_height;
 };

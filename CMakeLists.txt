@@ -24,6 +24,8 @@ set(PROJECT_SOURCE_FILES
   components/camera.cpp
   components/texture.h
   components/texture.cpp
+  components/Buffer.h
+  components/Buffer.cpp
   components/Skybox.h
   components/Skybox.cpp
   components/vertexLayout.h 

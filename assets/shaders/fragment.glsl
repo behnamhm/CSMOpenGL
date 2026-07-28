@@ -41,7 +41,8 @@ uniform int spotLightCount;
 
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[2];
-
+uniform sampler2DArray shadowMap;
+float farPlane = 500.0f;
 
 uniform sampler2D theTexture;
 uniform sampler2D roughnessMap;
@@ -53,14 +54,19 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 uniform samplerCube skybox;
 
+layout (std140) uniform LightSpaceMatrices
+{
+    mat4 lightSpaceMatrices[16];
+};
+uniform float cascadePlaneDistances[16];
+uniform int cascadeCount; 
 
-
-uniform vec3 albedo = vec3(0.35, 0.35, 0.35);   
+uniform vec3 albedo = vec3(0.2, 0.2, 0.2);   
 uniform float metallic;
 uniform float roughness;
-uniform float ao = 1.0;
+uniform float ao = 0.1;
 
-
+ uniform mat4 view;
 
 uniform vec3 eyePosition;
 
@@ -124,7 +130,70 @@ vec3 sampleOffsetDirections[20] = vec3[]
 ); 
 
 
+float ShadowCalculation(vec3 fragPosWorldSpace)
+{
+    // select cascade layer
+    vec4 fragPosViewSpace = view * vec4(fragPosWorldSpace, 1.0);
+    float depthValue = abs(fragPosViewSpace.z);
 
+    int layer = -1;
+    for (int i = 0; i < cascadeCount; ++i)
+    {
+        if (depthValue < cascadePlaneDistances[i])
+        {
+            layer = i;
+            break;
+        }
+    }
+    if (layer == -1)
+    {
+        layer = cascadeCount;
+    }
+
+    vec4 fragPosLightSpace = lightSpaceMatrices[layer] * vec4(fragPosWorldSpace, 1.0);
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if (currentDepth > 1.0)
+    {
+        return 0.0;
+    }
+    // calculate bias (based on depth map resolution and slope)
+    vec3 normal = normalize(Normal);
+    vec3 dir = -directionalLight.direction;
+	vec3 lightDir = normalize(dir);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    const float biasModifier = 0.5f;
+    if (layer == cascadeCount)
+    {
+        bias *= 1 / (farPlane * biasModifier);
+    }
+    else
+    {
+        bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
+    }
+
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(shadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, layer)).r;
+            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+        
+    return shadow;
+}
 
 
 vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor, vec3 lighPos, bool pointLight)
@@ -191,14 +260,14 @@ vec4 CalcLightByDirection(Light light, vec3 direction, float shadowFactor, vec3 
     vec3 specularIBL  = prefilteredColor * (FRoughness * brdf.x + brdf.y);
 
 
-	vec3 ambient = (diffuseIBL + specularIBL) * ao;
+    vec3 ambient = (diffuseIBL + specularIBL) * light.ambientIntensity * ao;
 
 	return (vec4(ambient, 1.0f) + (1.0 - shadowFactor) * vec4(Lo, 1));
 }
 
 vec4 CalcDirectionalLight()
 {
-	float shadowFactor = 0.0f;
+	float shadowFactor = ShadowCalculation(FragPos);
 	return CalcLightByDirection(directionalLight.base, -directionalLight.direction, shadowFactor, vec3(0, 0, 0), false);
 }
 
@@ -242,8 +311,10 @@ void main()
 
     float gamma = 2.2;
 	colour =  finalColour * texColor;
+    /*
 	vec3 hdr = colour.rgb;
 	hdr = hdr / (hdr + vec3(1.0));
 	colour.rgb = pow(hdr, vec3(1.0/gamma));
-
+    */
+     colour.rgb = pow(colour.rgb, vec3(1.0 / gamma));
 }

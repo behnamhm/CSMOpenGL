@@ -52,6 +52,8 @@ public:
 	void SetSpecular(GLuint textureUnit);
 	void SetRoughnessMap(GLuint textureUnit);
 	void SetMetalMap(GLuint textureUnit);
+	void SetCascadeCount(GLuint textureUnit);
+	void SetCascadeDistance(const std::string& name, float value);
 	void SetDirectionalLightTransform(glm::mat4* lTransform);
 	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
 	GLuint GetUseTextureLocation();
@@ -63,6 +65,7 @@ public:
 	void SetEquirectangularMap(float value);
 	void SetIrradianceMap(int value);
 	void SetPrefilterMap(int value);
+	void SetShadowMp(int value);
 	void SetBrdfLUT(int value);
 	void SetProjection(glm::mat4& projectionMatrix);
 	void SetView(glm::mat4& viewMatrix);
