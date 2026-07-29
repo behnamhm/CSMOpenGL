@@ -11,7 +11,6 @@
 #include "components/meshObject.h"
 #include "components/texture.h"
 #include "components/Buffer.h"
-#include "components/inputManager.h"
 #include "components/camera.h"
 #include "components/Skybox.h"
 #include "components/Model.h"
@@ -58,11 +57,10 @@ public:
         modelList[type]->LoadModel(fileName);
     }
 
-    InputManager inputManager;
+
     Camera camera;
     Skybox skybox;
     DirectionalLight mainLight;
-
 
     std::unordered_map<ShaderType, std::unique_ptr<Shader>> shaderList;
     std::unordered_map<MeshType, std::unique_ptr<Mesh>> meshList;
@@ -81,5 +79,6 @@ public:
 private:
     int width = 0;
     int height = 0;
+
 
 };

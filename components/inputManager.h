@@ -9,16 +9,18 @@ class InputManager
 {
 public:
     InputManager();
-    static void keyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
+    void keyCallback(GLFWwindow* window, int key, int scanCode, int action, int mods);
     static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);
     static void handleMouse(GLFWwindow* window, double xPos, double yPos);
     GLfloat getXChange();
     GLfloat getYChange();
 
-    void processInput(Shader& shader, GLFWwindow* window);
+    void processInput(Shader& shader, GLFWwindow* window, int &debugLayer, bool& showQuad, 
+                        std::vector<glm::mat4> &lightMatricesCache,
+                        std::vector<float> &shadowCascadeLevels, Scene& scene);
     void SetCallback(GLFWwindow* window);
-    ~InputManager();
-    static glm::vec2 offset;
+
+    glm::vec2 offset;
     bool* getsKeys() { return keys; }
     float metallicVal = 0.0f;
     float roughnessVal = 0.0f;

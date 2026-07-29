@@ -1,7 +1,6 @@
 #include "inputManager.h"
 #include <GLFW\glfw3.h>
 
-glm::vec2 InputManager::offset = glm::vec2(0.0f, 0.0f);
 
 
 InputManager::InputManager() 
@@ -14,26 +13,29 @@ InputManager::InputManager()
 
     xChange = 0.0f;
     yChange = 0.0f;
+    offset = glm::vec2{ 0.0f, 0.0f };
 }
 
 
 void InputManager::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+
+
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         switch (key)
         {
         case GLFW_KEY_W:
-            InputManager::offset.y += 0.01f;
+            offset.y += 0.01f;
             break;
         case GLFW_KEY_S:
-            InputManager::offset.y -= 0.01f;
+            offset.y -= 0.01f;
             break;
         case GLFW_KEY_D:
-            InputManager::offset.x += 0.01f;
+            offset.x += 0.01f;
             break;
         case GLFW_KEY_A:
-            InputManager::offset.x -= 0.01f;
+            offset.x -= 0.01f;
             break;
         }
     }
@@ -103,7 +105,9 @@ GLfloat InputManager::getYChange()
     return theChange;
 }
 
-void InputManager::processInput(Shader &shader, GLFWwindow* window)
+void InputManager::processInput(Shader& shader, GLFWwindow* window, int& debugLayer, bool& showQuad,
+                            std::vector<glm::mat4>& lightMatricesCache,
+                            std::vector<float>& shadowCascadeLevels, Scene& scene)
 {
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
@@ -142,15 +146,46 @@ void InputManager::processInput(Shader &shader, GLFWwindow* window)
         roughnessVal += 0.01f;
 
     }
+
+    
     shader.setUniform("metallic", std::min(metallicVal, 1.0f));
     shader.setUniform("roughness", std::min(roughnessVal, 1.0f));
 
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+
+    static int fPress = GLFW_RELEASE;
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE && fPress == GLFW_PRESS)
+    {
+        showQuad = !showQuad;
+    }
+    fPress = glfwGetKey(window, GLFW_KEY_F);
+
+    static int plusPress = GLFW_RELEASE;
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE && plusPress == GLFW_PRESS)
+    {
+        debugLayer++;
+        if (debugLayer > shadowCascadeLevels.size())
+        {
+            debugLayer = 0;
+        }
+    }
+    plusPress = glfwGetKey(window, GLFW_KEY_N);
+
+    static int cPress = GLFW_RELEASE;
+    float cameraNear = 0.1f;
+    float cameraFar = 500.0f;
+    ShadowSystem shadowSystem;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE && cPress == GLFW_PRESS)
+
+    {
+
+        lightMatricesCache = shadowSystem.getLightSpaceMatrices(scene, shadowCascadeLevels,
+            cameraNear, cameraFar);
+    }
+    cPress = glfwGetKey(window, GLFW_KEY_C);
 
 }
 
 
-
-InputManager::~InputManager()
-{
-
-}

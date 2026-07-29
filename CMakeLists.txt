@@ -12,10 +12,12 @@ set(PROJECT_SOURCE_FILES
   source/main.cpp
   source/Application.h
   source/Application.cpp
-  source/appObject.h
-  source/appObject.cpp
+  source/Renderer.h
+  source/Renderer.cpp
   scene/Scene.h
   scene/Scene.cpp
+  scene/Debug.h
+  scene/Debug.cpp
   components/shader.cpp
   components/shader.h
   components/inputManager.cpp
@@ -36,8 +38,8 @@ set(PROJECT_SOURCE_FILES
   components/window.h
   components/window.cpp
   components/objectTypes.h
-  lights/shadowMap.h 
-  lights/shadowMap.cpp 
+  lights/shadowSystem.h 
+  lights/shadowSystem.cpp 
   lights/directionalLight.h 
   lights/directionalLight.cpp
   lights/Light.h

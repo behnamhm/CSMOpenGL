@@ -11,7 +11,7 @@ class Window
 public:
 	Window();
 
-	bool init(Scene& scene, GLFWwindow*& thisWindow, int width, int height);
+	bool init(GLFWwindow*& thisWindow, int width, int height);
 
 	~Window();
 

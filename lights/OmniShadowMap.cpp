@@ -1,6 +1,6 @@
 #include "OmniShadowMap.h"
 
-OmniShadowMap::OmniShadowMap() : ShadowMap() {}
+OmniShadowMap::OmniShadowMap() : ShadowSystem() {}
 
 bool OmniShadowMap::Init(unsigned int width, unsigned int height)
 {

@@ -5,7 +5,7 @@ Window::Window()
 
 }
 
-bool Window::init(Scene& scene, GLFWwindow*& thisWindow, int width, int height)
+bool Window::init(GLFWwindow*& thisWindow, int width, int height)
 {
     if (!glfwInit())
     {
@@ -27,7 +27,7 @@ bool Window::init(Scene& scene, GLFWwindow*& thisWindow, int width, int height)
         return -1;
     }
 
-    scene.inputManager.SetCallback(thisWindow);
+
 
 
     //glfwSetWindowPos(window, 2000, 150);

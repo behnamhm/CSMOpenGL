@@ -3,11 +3,12 @@
 
 bool Application::Init(int width,int height)
 {
-    return window.init(scene, thisWindow, width, height);
+    return window.init(thisWindow, width, height);
 }
 
 void Application::Run()
 {
+    inputManager.SetCallback(thisWindow);
     scene.Register(thisWindow);
 
     // Load HDR
@@ -46,19 +47,21 @@ void Application::Run()
         lastTime = now;
 
         glfwPollEvents();
-        scene.inputManager.processInput(*scene.shaderList[ShaderType::Main], thisWindow);
-        appObj.processInput(scene, thisWindow, shadowCascadeLevels);
-        scene.camera.keyControl(scene.inputManager.getsKeys(), deltaTime);
-        scene.camera.mouseControl(scene.inputManager.getXChange(), scene.inputManager.getYChange());
+
+        inputManager.processInput(*scene.shaderList[ShaderType::Main], thisWindow, renderer.debugLayer, renderer.showQuad,
+                                     renderer.lightMatricesCache, shadowCascadeLevels, scene);
+
+        scene.camera.keyControl(inputManager.getsKeys(), deltaTime);
+        scene.camera.mouseControl(inputManager.getXChange(), inputManager.getYChange());
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render passes
-        appObj.ShadowPass(scene, deltaTime, lightFBO, depthMapResolution, shadowCascadeLevels, 
+        renderer.ShadowPass(scene, deltaTime, lightFBO, depthMapResolution, shadowCascadeLevels,
                           matricesUBO);
 
-        appObj.RenderPass(scene, deltaTime, envCubemap, irradianceMap, prefilterMap, 
+        renderer.RenderPass(scene, deltaTime, envCubemap, irradianceMap, prefilterMap,
                          brdfLUTTexture, shadowCascadeLevels, lightDepthMaps);
 
         glfwSwapBuffers(thisWindow);

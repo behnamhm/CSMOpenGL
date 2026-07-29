@@ -4,7 +4,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
-#include "ShadowMap.h"
+#include "shadowSystem.h"
 
 class Light
 {
@@ -14,7 +14,7 @@ public:
 		GLfloat red, GLfloat green, GLfloat blue,
 		GLfloat aIntensity, GLfloat dIntensity);
 
-	ShadowMap* getShadowMap() { return shadowMap; }
+	ShadowSystem* getShadowMap() { return shadowSystem; }
 
 	~Light();
 
@@ -25,6 +25,6 @@ protected:
 
 	glm::mat4 lightProj;
 
-	ShadowMap* shadowMap;
+	ShadowSystem* shadowSystem;
 };
 

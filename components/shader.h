@@ -62,8 +62,6 @@ private:
 	int pointLightCount;
 	int spotLightCount;
 
-
-
 	GLuint shaderID, uniformProjection, uniformModel, uniformView, uniformEyePosition,
 		uniformSpecularIntensity, uniformShininess,
 		uniformTexture, uniformDirectionalShadowMap, unifromTexture_specular,

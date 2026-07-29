@@ -13,8 +13,8 @@ Light::Light(GLuint shadowWidth, GLuint shadowHeight, GLfloat red, GLfloat green
 	ambientIntensity = aIntensity;
 	diffuseIntensity = dIntensity;
 
-	shadowMap = new ShadowMap();
-	shadowMap->Init(shadowWidth, shadowHeight);
+	shadowSystem = new ShadowSystem();
+	shadowSystem->Init(shadowWidth, shadowHeight);
 }
 
 Light::~Light()

@@ -15,11 +15,12 @@
 #include "components/camera.h"
 #include "components/Skybox.h"
 #include "components/Model.h"
+#include "lights/shadowSystem.h"
+#include "scene/Debug.h"
 
 
 class Scene;
-
-class appObject
+class Renderer
 {
 public:
 
@@ -34,25 +35,14 @@ public:
 					unsigned int& depthMapResolution, std::vector<float>& shadowCascadeLevels,
 					unsigned int& matricesUBO);
 
-	void drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& lightMatrices, Shader* shader);
-	void processInput(Scene& scene, GLFWwindow* window, std::vector<float>& shadowCascadeLevels);
-	std::vector<glm::mat4> getLightSpaceMatrices(Scene& scene, std::vector<float>& shadowCascadeLevels,
-													float& cameraNearPlane, float& cameraFarPlane);
-	glm::mat4 getLightSpaceMatrix(Scene& scene, const float nearPlane, const float farPlane);
-	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
-  	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 
 	GLuint uniformProjection{ 0 }, uniformModel{ 0 }, uniformView{ 0 }, uniformEyePosition{ 0 };
 	std::vector<glm::mat4> lightMatricesCache;
-	std::vector<GLuint> visualizerVAOs;
-	std::vector<GLuint> visualizerVBOs;
-	std::vector<GLuint> visualizerEBOs;
 
-	int fb_width;
-	int fb_height;
+	ShadowSystem shadowSystem;
+	Debug debug;
+
+
 	int debugLayer = 0;
 	bool showQuad = false;
-	float cameraNear = 0.1f;
-	float cameraFar = 500.0f;
-
 };

@@ -1,7 +1,7 @@
 #pragma once
-#include "ShadowMap.h"
+#include "ShadowSystem.h"
 class OmniShadowMap :
-	public ShadowMap
+	public ShadowSystem
 {
 public:
 	OmniShadowMap();
