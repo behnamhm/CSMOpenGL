@@ -27,55 +27,35 @@ public:
 	void CreateFromFiles(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFiles(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
 
-	void Validate();
 
 	std::string ReadFile(const char* fileLocation);
 
 	GLuint GetProjectionLocation();
 	GLuint GetModelLocation();
 	GLuint GetViewLocation();
-	GLuint GetAmbientIntensityLocation();
-	GLuint GetAmbientColourLocation();
-	GLuint GetDiffuseIntensityLocation();
-	GLuint GetDirectionLocation();
-	GLuint GetSpecularIntensityLocation();
-	GLuint GetShininessLocation();
 	GLuint GetEyePositionLocation();
-	GLuint GetOmniLightPosLocation();
-	GLuint GetFarPlaneLocation();
-
-
 	void SetDirectionalLight(DirectionalLight* dLight);
 	void SetPointLights(std::vector<std::unique_ptr<PointLight>>& PointLightList, 
 						unsigned int lightCount, unsigned int textureUnit, unsigned int offset);
 	void SetTexture(GLuint textureUnit);
-	void SetSpecular(GLuint textureUnit);
-	void SetRoughnessMap(GLuint textureUnit);
-	void SetMetalMap(GLuint textureUnit);
-	void SetCascadeCount(GLuint textureUnit);
-	void SetCascadeDistance(const std::string& name, float value);
 	void SetDirectionalLightTransform(glm::mat4* lTransform);
-	void SetLightMatrices(std::vector<glm::mat4> lightMatrices);
-	GLuint GetUseTextureLocation();
-	GLuint GetMetallic();
-	void SetUseTexture(bool value);
-	void SetMetallic(float value);
-	void SetRoughness(float value);
-	void SetEnvironmentMap(float value);
-	void SetEquirectangularMap(float value);
-	void SetIrradianceMap(int value);
-	void SetPrefilterMap(int value);
-	void SetShadowMp(int value);
-	void SetLayer(int value);
-	void SetColors(const glm::vec4& value);
-	void SetBrdfLUT(int value);
-	void SetProjection(glm::mat4& projectionMatrix);
-	void SetView(glm::mat4& viewMatrix);
 
+	void Shader::setUniform(const std::string& name, bool value);
+	void Shader::setUniform(const std::string& name, int value);
+	void Shader::setUniform(const std::string& name, float value);
+	void Shader::setUniform(const std::string& name, const glm::vec2& value);
+	void Shader::setUniform(const std::string& name, float x, float y);
+	void Shader::setUniform(const std::string& name, const glm::vec3& value);
+	void Shader::setUniform(const std::string& name, float x, float y, float z);
+	void Shader::setUniform(const std::string& name, const glm::vec4& value);
+	void Shader::setUniform(const std::string& name, float x, float y, float z, float w);
+	void Shader::setUniform(const std::string& name, const glm::mat2& mat);
+	void Shader::setUniform(const std::string& name, const glm::mat3& mat);
+	void Shader::setUniform(const std::string& name, const glm::mat4& mat);
 
 	void UseShader();
 	void ClearShader();
-
+	void Validate();
 	~Shader();
 
 private:

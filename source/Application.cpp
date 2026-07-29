@@ -17,26 +17,26 @@ void Application::Run()
     Buffer.SetupCubeMap(envCubemap);
 
     // Capture framebuffer
-    Buffer.CaptureFrameBuffer(*scene.shaderList[ShaderType::Cubemap], *scene.meshList.at(MeshType::Cube), captureFBO, captureRBO, hdrTexture, envCubemap,
-                                  captureProjection, captureViews);
+    Buffer.CaptureFrameBuffer(*scene.shaderList[ShaderType::Cubemap], *scene.meshList.at(MeshType::Cube), 
+                                captureFBO, captureRBO, hdrTexture, envCubemap, captureProjection, captureViews);
 
     // Irradiance Map framebuffer
-    Buffer.IrradianceFrameBuffer(*scene.shaderList[ShaderType::Irradiance], *scene.meshList.at(MeshType::Cube), captureFBO, captureRBO, irradianceMap, envCubemap,
-                                   captureProjection, captureViews);
+    Buffer.IrradianceFrameBuffer(*scene.shaderList[ShaderType::Irradiance], *scene.meshList.at(MeshType::Cube), 
+                                   captureFBO, captureRBO, irradianceMap, envCubemap, captureProjection, captureViews);
 
     // Prefilter framebuffer
-    Buffer.PrefilterFrameBuffer(*scene.shaderList[ShaderType::Prefilter], *scene.meshList.at(MeshType::Cube), captureFBO, captureRBO, prefilterMap, envCubemap,
-                                   captureProjection, captureViews);
+    Buffer.PrefilterFrameBuffer(*scene.shaderList[ShaderType::Prefilter], *scene.meshList.at(MeshType::Cube), 
+                                 captureFBO, captureRBO, prefilterMap, envCubemap, captureProjection, captureViews);
 
     // brdfLUT framebuffer
-    Buffer.BRDFLutFrameBuffer(*scene.shaderList[ShaderType::BRDF], *scene.meshList.at(MeshType::Cube), captureFBO, captureRBO, brdfLUTTexture);
+    Buffer.BRDFLutFrameBuffer(*scene.shaderList[ShaderType::BRDF], *scene.meshList.at(MeshType::Cube), 
+                               captureFBO, captureRBO, brdfLUTTexture);
 
     // Light depth framebuffer
     Buffer.LightDepthMapBuffer(lightFBO,  lightDepthMaps, depthMapResolution, shadowCascadeLevels);
 
     // UBO buffer config
     Buffer.ConfigureUBOBuffer(matricesUBO);
-
 
 
     while (!glfwWindowShouldClose(thisWindow))

@@ -60,15 +60,16 @@ void Scene::Register(GLFWwindow* thisWindow)
 
     // set uniform values
     shaderList[ShaderType::Main]->UseShader();
-    shaderList[ShaderType::Main]->SetProjection(projectionMatrix);
-    shaderList[ShaderType::Main]->SetView(camera_view);
-    shaderList[ShaderType::Main]->SetIrradianceMap(0);
-    shaderList[ShaderType::Main]->SetPrefilterMap(1);
-    shaderList[ShaderType::Main]->SetBrdfLUT(2);
-    shaderList[ShaderType::Main]->SetShadowMp(3);
-    shaderList[ShaderType::Main]->SetRoughnessMap(9);
-    shaderList[ShaderType::Main]->SetMetalMap(10);
+    shaderList[ShaderType::Main]->setUniform("projection", projectionMatrix);
+    shaderList[ShaderType::Main]->setUniform("view", camera_view);
+    shaderList[ShaderType::Main]->setUniform("irradianceMap", 0);
+    shaderList[ShaderType::Main]->setUniform("prefilterMap", 1);
+    shaderList[ShaderType::Main]->setUniform("brdfLUT", 2);
+    shaderList[ShaderType::Main]->setUniform("shadowMap", 3);
+    shaderList[ShaderType::Main]->setUniform("roughnessMap", 9);
+    shaderList[ShaderType::Main]->setUniform("metallicMap", 10);
+
     shaderList[ShaderType::Environment]->UseShader();
-    shaderList[ShaderType::Environment]->SetEnvironmentMap(0);
-    shaderList[ShaderType::Environment]->SetProjection(projectionMatrix);
+    shaderList[ShaderType::Environment]->setUniform("environmentMap", 0);
+    shaderList[ShaderType::Environment]->setUniform("projection", projectionMatrix);
 }

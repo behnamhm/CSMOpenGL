@@ -24,8 +24,8 @@ void Buffer::CaptureFrameBuffer(Shader& shader, Mesh& cube, unsigned int& captur
 
 
 	shader.UseShader();
-	shader.SetEquirectangularMap(0);
-	shader.SetProjection(captureProjection);
+	shader.setUniform("equirectangularMap", 0);
+	shader.setUniform("projection", captureProjection);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
@@ -33,7 +33,7 @@ void Buffer::CaptureFrameBuffer(Shader& shader, Mesh& cube, unsigned int& captur
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 	for (unsigned int i = 0; i < 6; ++i)
 	{
-		shader.SetView(captureViews[i]);
+		shader.setUniform("view", captureViews[i]);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -81,8 +81,8 @@ void Buffer::IrradianceFrameBuffer(Shader& shader, Mesh& cube, unsigned int& cap
 
 
 	shader.UseShader();
-	shader.SetEnvironmentMap(0);
-	shader.SetProjection(captureProjection);
+	shader.setUniform("environmentMap", 0);
+	shader.setUniform("projection", captureProjection);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -90,7 +90,7 @@ void Buffer::IrradianceFrameBuffer(Shader& shader, Mesh& cube, unsigned int& cap
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 	for (unsigned int i = 0; i < 6; ++i)
 	{
-		shader.SetView(captureViews[i]);
+		shader.setUniform("view", captureViews[i]);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -121,8 +121,8 @@ void Buffer::PrefilterFrameBuffer(Shader& shader, Mesh& cube, unsigned int& capt
 
 
 	shader.UseShader();
-	shader.SetEnvironmentMap(0);
-	shader.SetProjection(captureProjection);
+	shader.setUniform("environmentMap", 0);
+	shader.setUniform("projection", captureProjection);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
@@ -138,10 +138,10 @@ void Buffer::PrefilterFrameBuffer(Shader& shader, Mesh& cube, unsigned int& capt
 		glViewport(0, 0, mipWidth, mipHeight);
 
 		float roughness = (float)mip / (float)(maxMipLevels - 1);
-		shader.SetRoughness(roughness);
+		shader.setUniform("roughness", roughness);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			shader.SetView(captureViews[i]);
+			shader.setUniform("view", captureViews[i]);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			cube.Render();

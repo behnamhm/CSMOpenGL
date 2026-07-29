@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+
 Shader::Shader()
 {
 	shaderID = 0;
@@ -37,103 +38,6 @@ void Shader::CreateFromFiles(const char* vertexLocation, const char* geometryLoc
 	CompileShader(vertexCode, geometryCode, fragmentCode);
 }
 
-
-GLuint Shader::GetUseTextureLocation()
-{
-	return glGetUniformLocation(shaderID, "textureUse");
-}
-
-
-
-void Shader::SetUseTexture(bool value)
-{
-	glUniform1i(GetUseTextureLocation(), value);
-}
-
-void Shader::SetMetallic(float value)
-{
-	GLint location = glGetUniformLocation(shaderID, "metallic");
-	glUniform1f(location, value);
-}
-
-void Shader::SetRoughness(float value)
-{
-	GLint location = glGetUniformLocation(shaderID, "roughness");
-	glUniform1f(location, value);
-}
-
-void Shader::SetEnvironmentMap(float value)
-{
-	GLint location = glGetUniformLocation(shaderID, "environmentMap");
-	glUniform1f(location, value);
-}
-
-void Shader::SetEquirectangularMap(float value)
-{
-	GLint location = glGetUniformLocation(shaderID, "equirectangularMap");
-	glUniform1f(location, value);
-}
-
-void Shader::SetIrradianceMap(int value)
-{
-	GLint location = glGetUniformLocation(shaderID, "irradianceMap");
-	glUniform1i(location, value);
-
-}
-
-void Shader::SetPrefilterMap(int value)
-{
-	GLint location = glGetUniformLocation(shaderID, "prefilterMap");
-	glUniform1i(location, value);
-
-}	
-
-void Shader::SetBrdfLUT(int value)
-{
-	GLint location = glGetUniformLocation(shaderID, "brdfLUT");
-	glUniform1i(location, value);
-
-}
-
-void Shader::SetShadowMp(int value)
-{
-	GLint location = glGetUniformLocation(shaderID, "shadowMap");
-	glUniform1i(location, value);
-
-}
-
-void Shader::SetLayer(int value)
-{
-	GLint location = glGetUniformLocation(shaderID, "layer");
-	glUniform1i(location, value);
-
-}
-
-void Shader::SetColors(const glm::vec4& value)
-{
-	glUniform4fv(glGetUniformLocation(shaderID, "color"), 1, &value[0]);
-}
-
-
-void Shader::SetProjection(glm::mat4& projectionMatrix)
-{
-	GLint location = glGetUniformLocation(shaderID, "projection");
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
-}
-
-void Shader::SetView(glm::mat4& viewMatrix)
-{
-	GLint location = glGetUniformLocation(shaderID, "view");
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-}
-
-
-GLuint Shader::GetMetallic()
-{
-	return glGetUniformLocation(shaderID, "metallic");
-}
 
 
 std::string Shader::ReadFile(const char* fileLocation)
@@ -190,20 +94,7 @@ void Shader::CompileShader(const char* vertexCode, const char* geometryCode, con
 	CompileProgram();
 }
 
-void Shader::Validate()
-{
-	GLint result = 0;
-	GLchar eLog[1024] = { 0 };
 
-	glValidateProgram(shaderID);
-	glGetProgramiv(shaderID, GL_VALIDATE_STATUS, &result);
-	if (!result)
-	{
-		glGetProgramInfoLog(shaderID, sizeof(eLog), NULL, eLog);
-		printf("Error validating program: '%s'\n", eLog);
-		return;
-	}
-}
 
 void Shader::CompileProgram() {
 
@@ -292,6 +183,21 @@ void Shader::CompileProgram() {
 	}
 }
 
+void Shader::Validate()
+{
+	GLint result = 0;
+	GLchar eLog[1024] = { 0 };
+
+	glValidateProgram(shaderID);
+	glGetProgramiv(shaderID, GL_VALIDATE_STATUS, &result);
+	if (!result)
+	{
+		glGetProgramInfoLog(shaderID, sizeof(eLog), NULL, eLog);
+		printf("Error validating program: '%s'\n", eLog);
+		return;
+	}
+}
+
 GLuint Shader::GetProjectionLocation()
 {
 	return uniformProjection;
@@ -304,41 +210,10 @@ GLuint Shader::GetViewLocation()
 {
 	return uniformView;
 }
-GLuint Shader::GetAmbientColourLocation()
-{
-	return uniformDirectionalLight.uniformColour;
-}
-GLuint Shader::GetAmbientIntensityLocation()
-{
-	return uniformDirectionalLight.uniformAmbientIntensity;
-}
-GLuint Shader::GetDiffuseIntensityLocation()
-{
-	return uniformDirectionalLight.uniformDiffuseIntensity;
-}
-GLuint Shader::GetDirectionLocation()
-{
-	return uniformDirectionalLight.uniformDirection;
-}
-GLuint Shader::GetSpecularIntensityLocation()
-{
-	return uniformSpecularIntensity;
-}
-GLuint Shader::GetShininessLocation()
-{
-	return uniformShininess;
-}
+
 GLuint Shader::GetEyePositionLocation()
 {
 	return uniformEyePosition;
-}
-GLuint Shader::GetOmniLightPosLocation()
-{
-	return uniformOmniLightPos;
-}
-GLuint Shader::GetFarPlaneLocation()
-{
-	return uniformFarPlane;
 }
 
 void Shader::SetDirectionalLight(DirectionalLight* dLight)
@@ -371,48 +246,13 @@ void Shader::SetTexture(GLuint textureUnit)
 
 }
 
-void Shader::SetSpecular(GLuint textureUnit)
-{
-
-	glUniform1i(unifromTexture_specular, textureUnit);
-}
-
-void Shader::SetRoughnessMap(GLuint textureUnit)
-{
-	GLint location = glGetUniformLocation(shaderID, "roughnessMap");
-	glUniform1i(location, textureUnit);
-}
-
-void Shader::SetMetalMap(GLuint textureUnit)
-{
-	GLint location = glGetUniformLocation(shaderID, "metallicMap");
-	glUniform1i(location, textureUnit);
-}
-
-void Shader::SetCascadeCount(GLuint textureUnit)
-{
-	GLint location = glGetUniformLocation(shaderID, "cascadeCount");
-	glUniform1i(location, textureUnit);
-}
-
-void Shader::SetCascadeDistance(const std::string& name, float value)
-{
-	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
-}
-
 
 void Shader::SetDirectionalLightTransform(glm::mat4* lTransform)
 {
 	glUniformMatrix4fv(uniformDirectionalLightTransform, 1, GL_FALSE, glm::value_ptr(*lTransform));
 }
 
-void Shader::SetLightMatrices(std::vector<glm::mat4> lightMatrices)
-{
-	for (size_t i = 0; i < 6; i++)
-	{
-		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(lightMatrices[i]));
-	}
-}
+
 
 void Shader::UseShader()
 {
@@ -457,6 +297,63 @@ void Shader::AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderT
 	}
 
 	glAttachShader(theProgram, theShader);
+}
+
+void Shader::setUniform(const std::string& name, bool value) 
+{
+	glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value);
+}
+
+void Shader::setUniform(const std::string& name, int value) 
+{
+	glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+
+void Shader::setUniform(const std::string& name, float value) 
+{
+	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+
+void Shader::setUniform(const std::string& name, const glm::vec2& value) 
+{
+	glUniform2fv(glGetUniformLocation(shaderID, name.c_str()), 1, &value[0]);
+}
+void Shader::setUniform(const std::string& name, float x, float y) 
+{
+	glUniform2f(glGetUniformLocation(shaderID, name.c_str()), x, y);
+}
+
+void Shader::setUniform(const std::string& name, const glm::vec3& value) 
+{
+	glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, &value[0]);
+}
+void Shader::setUniform(const std::string& name, float x, float y, float z) 
+{
+	glUniform3f(glGetUniformLocation(shaderID, name.c_str()), x, y, z);
+}
+
+void Shader::setUniform(const std::string& name, const glm::vec4& value) 
+{
+	glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), 1, &value[0]);
+}
+void Shader::setUniform(const std::string& name, float x, float y, float z, float w)
+{
+	glUniform4f(glGetUniformLocation(shaderID, name.c_str()), x, y, z, w);
+}
+
+void Shader::setUniform(const std::string& name, const glm::mat2& mat) 
+{
+	glUniformMatrix2fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::setUniform(const std::string& name, const glm::mat3& mat) 
+{
+	glUniformMatrix3fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::setUniform(const std::string& name, const glm::mat4& mat) 
+{
+	glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
 Shader::~Shader()

@@ -142,8 +142,8 @@ void InputManager::processInput(Shader &shader, GLFWwindow* window)
         roughnessVal += 0.01f;
 
     }
-    shader.SetMetallic(std::min(metallicVal, 1.0f));
-    shader.SetRoughness(std::min(roughnessVal, 1.0f));
+    shader.setUniform("metallic", std::min(metallicVal, 1.0f));
+    shader.setUniform("roughness", std::min(roughnessVal, 1.0f));
 
 
 }

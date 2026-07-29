@@ -19,21 +19,10 @@ void DirectionalLight::UseLight(GLfloat ambientIntensityLocation, GLfloat ambien
 	GLfloat diffuseIntensityLocation, GLfloat directionLocation)
 {
 	glUniform3f(ambientColourLocation, colour.x, colour.y, colour.z);
-	//glUniform1f(ambientIntensityLocation, ambientIntensity);
-
-
 	glUniform3f(directionLocation, direction.x, direction.y, direction.z);
-	//glUniform1f(diffuseIntensityLocation, diffuseIntensity);
-	if (isOn)
-	{
-		glUniform1f(ambientIntensityLocation, ambientIntensity);
-		glUniform1f(diffuseIntensityLocation, diffuseIntensity);
-	}
-	else
-	{
-		glUniform1f(ambientIntensityLocation, 0.0f);
-		glUniform1f(diffuseIntensityLocation, 0.0f);
-	}
+	glUniform1f(ambientIntensityLocation, ambientIntensity);
+	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
+
 }
 
 glm::mat4 DirectionalLight::CalculateLightTransform()

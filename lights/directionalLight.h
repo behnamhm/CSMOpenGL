@@ -15,11 +15,11 @@ public:
 		GLfloat diffuseIntensityLocation, GLfloat directionLocation);
 
 	glm::mat4 CalculateLightTransform();
-	void Toggle() { isOn = !isOn; }
+
 	~DirectionalLight();
 
 private:
 	glm::vec3 direction;
-	bool isOn;
+
 };
 

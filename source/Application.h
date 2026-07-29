@@ -23,7 +23,6 @@ public:
     appObject appObj;
 private:
 
-
     std::vector<float> shadowCascadeLevels{ 500.0f / 50.0f,
                                             500.0f / 25.0f,
                                             500.0f / 10.0f,
@@ -31,12 +30,9 @@ private:
 
     glm::mat4 captureProjection;
     std::vector<glm::mat4> captureViews;
-
     Buffer Buffer;
-
     GLfloat deltaTime = 0.0f;
     GLfloat lastTime = 0.0f;
-
     GLFWwindow* thisWindow = nullptr;
     Window window;
 

@@ -69,8 +69,8 @@ void appObject::RenderPass(Scene& scene, GLfloat deltaTime,
     // environment cube map
     glm::mat4 viewMatrix = glm::mat4(glm::mat3(scene.camera.calculateViewMatrix()));
     scene.shaderList[ShaderType::Environment]->UseShader();
-    scene.shaderList[ShaderType::Environment]->SetView(viewMatrix);
-    scene.shaderList[ShaderType::Environment]->SetProjection(scene.projectionMatrix);
+    scene.shaderList[ShaderType::Environment]->setUniform("view", viewMatrix);
+    scene.shaderList[ShaderType::Environment]->setUniform("projection", scene.projectionMatrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     glDepthFunc(GL_LEQUAL);
@@ -99,15 +99,16 @@ void appObject::RenderPass(Scene& scene, GLfloat deltaTime,
     glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(scene.camera.calculateViewMatrix()));
     glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(scene.projectionMatrix));
 
-    scene.shaderList.at(ShaderType::Main)->SetView(scene.camera.calculateViewMatrix());
+    scene.shaderList.at(ShaderType::Main)->setUniform("view", scene.camera.calculateViewMatrix());
     scene.shaderList.at(ShaderType::Main)->SetDirectionalLight(&*scene.DirectionalLightList[0]);
     scene.shaderList.at(ShaderType::Main)->SetPointLights(scene.PointLightList, 2, 3, 0);
     glm::mat4 lightTransform = scene.DirectionalLightList[0]->CalculateLightTransform();
-    scene.shaderList.at(ShaderType::Main)->SetDirectionalLightTransform(&lightTransform);
-    scene.shaderList.at(ShaderType::Main)->SetCascadeCount(shadowCascadeLevels.size());
-    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
+    scene.shaderList.at(ShaderType::Main)->setUniform("directionalLightTransform", &lightTransform);
+    int shadowLevelCount = shadowCascadeLevels.size();
+    scene.shaderList.at(ShaderType::Main)->setUniform("cascadeCount", shadowLevelCount);
+    for (size_t i = 0; i < shadowLevelCount; ++i)
     {
-        scene.shaderList.at(ShaderType::Main)->SetCascadeDistance("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+        scene.shaderList.at(ShaderType::Main)->setUniform("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }
 
     scene.shaderList.at(ShaderType::Main)->Validate();
@@ -121,14 +122,14 @@ void appObject::RenderPass(Scene& scene, GLfloat deltaTime,
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         scene.shaderList[ShaderType::DebugCascade]->UseShader();
-        scene.shaderList[ShaderType::DebugCascade]->SetProjection(scene.projectionMatrix);
-        scene.shaderList[ShaderType::DebugCascade]->SetView(scene.camera.calculateViewMatrix());
+        scene.shaderList[ShaderType::DebugCascade]->setUniform("projection", scene.projectionMatrix);
+        scene.shaderList[ShaderType::DebugCascade]->setUniform("view", scene.camera.calculateViewMatrix());
         drawCascadeVolumeVisualizers(lightMatricesCache, &*scene.shaderList[ShaderType::DebugCascade]);
         glDisable(GL_BLEND);
     }
 
     scene.shaderList[ShaderType::DebugDepthQuad]->UseShader();
-    scene.shaderList[ShaderType::DebugDepthQuad]->SetLayer(debugLayer);
+    scene.shaderList[ShaderType::DebugDepthQuad]->setUniform("layer", debugLayer);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);
     if (showQuad)
@@ -293,7 +294,7 @@ void appObject::drawCascadeVolumeVisualizers(const std::vector<glm::mat4>& light
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
         glBindVertexArray(visualizerVAOs[i]);
-        shader->SetColors(colors[i % 3]);
+        shader->setUniform("color", colors[i % 3]);
         glDrawElements(GL_TRIANGLES, GLsizei(36), GL_UNSIGNED_INT, 0);
 
         glDeleteBuffers(1, &visualizerVBOs[i]);
