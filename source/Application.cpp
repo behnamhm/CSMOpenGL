@@ -55,7 +55,7 @@ void Application::Run()
         scene.camera.mouseControl(inputManager.getXChange(), inputManager.getYChange());
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // render passes
         renderer.ShadowPass(scene, deltaTime, lightFBO, depthMapResolution, shadowCascadeLevels,

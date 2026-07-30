@@ -30,6 +30,7 @@ public:
 	glm::mat4 getLightSpaceMatrix(Scene& scene, const float nearPlane, const float farPlane);
 	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
 	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
+
 	int fb_width;
 	int fb_height;
 	~ShadowSystem();

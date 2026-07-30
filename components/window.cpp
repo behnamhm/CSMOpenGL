@@ -38,7 +38,10 @@ bool Window::init(GLFWwindow*& thisWindow, int width, int height)
         glfwTerminate();
         return -1;
     }
-
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     return true;

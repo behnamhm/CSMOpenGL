@@ -24,7 +24,7 @@ class Renderer
 {
 public:
 
-	void RenderScene(Scene& scene, GLuint uniformModel, GLfloat deltaTime);
+	void RenderScene(Scene& scene, Shader* shader, GLuint uniformModel, GLfloat deltaTime);
 
 	void RenderPass(Scene& scene, GLfloat deltaTime,
 					unsigned int& envCubemap, unsigned int& irradianceMap,

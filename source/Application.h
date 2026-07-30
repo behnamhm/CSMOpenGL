@@ -23,8 +23,8 @@ public:
     Renderer renderer;
 private:
 
-    std::vector<float> shadowCascadeLevels{ 500.0f / 50.0f,
-                                            500.0f / 25.0f,
+    std::vector<float> shadowCascadeLevels{ 500.0f / 150.0f,
+                                            500.0f / 100.0f,
                                             500.0f / 10.0f,
                                             500.0f / 2.0f };
 

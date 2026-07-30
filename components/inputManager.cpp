@@ -180,9 +180,16 @@ void InputManager::processInput(Shader& shader, GLFWwindow* window, int& debugLa
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE && cPress == GLFW_PRESS)
 
     {
-
+        if (lightMatricesCache.size() != 0)
+        {
+            lightMatricesCache.clear();
+        }
+        else
+        {
         lightMatricesCache = shadowSystem.getLightSpaceMatrices(scene, shadowCascadeLevels,
             cameraNear, cameraFar);
+
+        }
     }
     cPress = glfwGetKey(window, GLFW_KEY_C);
 

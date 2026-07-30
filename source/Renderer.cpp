@@ -3,7 +3,7 @@
 
 
 
-void Renderer::RenderScene(Scene& scene, GLuint uniformModel, GLfloat deltaTime)
+void Renderer::RenderScene(Scene& scene, Shader* shader, GLuint uniformModel, GLfloat deltaTime)
 {
     // floor
     glm::mat4 floor_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -13,14 +13,14 @@ void Renderer::RenderScene(Scene& scene, GLuint uniformModel, GLfloat deltaTime)
     scene.textureList.at(TextureType::Checker)->UseTexture(GL_TEXTURE7);
     scene.textureList.at(TextureType::CheckerMetal)->UseTexture(GL_TEXTURE10);
     scene.textureList.at(TextureType::CheckerRoughness)->UseTexture(GL_TEXTURE9);
-    scene.shaderList.at(ShaderType::Main)->SetTexture(7);
+    shader->SetTexture(7);
     scene.meshList.at(MeshType::Floor)->Render();
 
     // external model
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
     scene.textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
-    scene.shaderList.at(ShaderType::Main)->SetTexture(8);
+    shader->SetTexture(8);
     scene.modelList.at(ModelType::Spaceship)->RenderModel();
 
 }
@@ -44,13 +44,13 @@ void Renderer::ShadowPass(Scene& scene, GLfloat deltaTime, unsigned int& lightFB
     glCullFace(GL_FRONT);  
 
     glViewport(0, 0, shadowSystem.fb_width, shadowSystem.fb_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     uniformModel = scene.shaderList.at(ShaderType::ShadowMap)->GetModelLocation();
 
     scene.shaderList.at(ShaderType::ShadowMap)->Validate();
 
-    RenderScene(scene, uniformModel, deltaTime);
+    RenderScene(scene, &*scene.shaderList.at(ShaderType::Main), uniformModel, deltaTime);
     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -65,7 +65,7 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
 
     glViewport(0, 0, 1920, 1080);
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     // environment cube map
     glm::mat4 viewMatrix = glm::mat4(glm::mat3(scene.camera.calculateViewMatrix()));
@@ -115,21 +115,49 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
     scene.shaderList.at(ShaderType::Main)->Validate();
 
     // render
-    RenderScene(scene, uniformModel, deltaTime);
+    RenderScene(scene, &*scene.shaderList.at(ShaderType::Main), uniformModel, deltaTime);
 
     // debug
+
     if (lightMatricesCache.size() != 0)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_STENCIL_TEST);
+
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(-1.0f, -1.0f);
+
+        glDepthMask(GL_FALSE);
         scene.shaderList[ShaderType::DebugCascade]->UseShader();
         scene.shaderList[ShaderType::DebugCascade]->setUniform("projection", scene.projectionMatrix);
         scene.shaderList[ShaderType::DebugCascade]->setUniform("view", scene.camera.calculateViewMatrix());
-        debug.drawCascadeVolumeVisualizers(lightMatricesCache, &*scene.shaderList[ShaderType::DebugCascade]);
+
+        int shadowLevelCount = shadowCascadeLevels.size();
+        scene.shaderList[ShaderType::DebugCascade]->setUniform("cascadeCount",
+            shadowLevelCount);
+
+        for (int i = 0; i < shadowCascadeLevels.size(); ++i)
+        {
+            scene.shaderList[ShaderType::DebugCascade]->setUniform(
+                "cascadePlaneDistances[" + std::to_string(i) + "]",
+                shadowCascadeLevels[i]);
+        }
+        GLuint debugUniformModel =
+            scene.shaderList[ShaderType::DebugCascade]->GetModelLocation();
+
+        RenderScene(scene, &*scene.shaderList.at(ShaderType::DebugCascade), debugUniformModel, deltaTime);
+        glDepthMask(GL_TRUE);
+
+        glDisable(GL_POLYGON_OFFSET_FILL);
+
+        glDisable(GL_STENCIL_TEST);
         glDisable(GL_BLEND);
+
     }
 
-    scene.shaderList[ShaderType::DebugDepthQuad]->UseShader();
     scene.shaderList[ShaderType::DebugDepthQuad]->setUniform("layer", debugLayer);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D_ARRAY, lightDepthMaps);

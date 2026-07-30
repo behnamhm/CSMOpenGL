@@ -157,6 +157,8 @@ std::vector<glm::vec4> ShadowSystem::getFrustumCornersWorldSpace(const glm::mat4
     return frustumCorners;
 }
 
+
+
 ShadowSystem::~ShadowSystem()
 {
 	if (FBO)
