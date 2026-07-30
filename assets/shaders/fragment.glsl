@@ -168,7 +168,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace)
     vec3 normal = normalize(Normal);
     vec3 dir = -directionalLight.direction;
 	vec3 lightDir = normalize(dir);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.001);
     const float biasModifier = 0.5f;
     if (layer == cascadeCount)
     {

@@ -34,6 +34,7 @@ enum class TextureType
 
 enum class ModelType
 {
-	Spaceship
+	Spaceship,
+	Bench
 };
 

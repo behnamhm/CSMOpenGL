@@ -15,13 +15,15 @@ void Renderer::RenderScene(Scene& scene, Shader* shader, GLuint uniformModel, GL
     scene.textureList.at(TextureType::CheckerRoughness)->UseTexture(GL_TEXTURE9);
     shader->SetTexture(7);
     scene.meshList.at(MeshType::Floor)->Render();
-
+    
     // external model
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-    scene.textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
-    shader->SetTexture(8);
-    scene.modelList.at(ModelType::Spaceship)->RenderModel();
+    //scene.textureList.at(TextureType::SpaceshipMetal)->UseTexture(GL_TEXTURE10);
+
+    shader->SetTexture(7);
+    scene.modelList.at(ModelType::Bench)->RenderModel();
 
 }
 
@@ -43,14 +45,12 @@ void Renderer::ShadowPass(Scene& scene, GLfloat deltaTime, unsigned int& lightFB
     glClear(GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);  
 
-    glViewport(0, 0, shadowSystem.fb_width, shadowSystem.fb_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     uniformModel = scene.shaderList.at(ShaderType::ShadowMap)->GetModelLocation();
 
     scene.shaderList.at(ShaderType::ShadowMap)->Validate();
 
-    RenderScene(scene, &*scene.shaderList.at(ShaderType::Main), uniformModel, deltaTime);
+    RenderScene(scene, &*scene.shaderList.at(ShaderType::ShadowMap), uniformModel, deltaTime);
     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -117,6 +117,7 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
     // render
     RenderScene(scene, &*scene.shaderList.at(ShaderType::Main), uniformModel, deltaTime);
 
+
     // debug
 
     if (lightMatricesCache.size() != 0)
@@ -124,12 +125,9 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_STENCIL_TEST);
-
         glClear(GL_STENCIL_BUFFER_BIT);
-
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(-1.0f, -1.0f);
-
         glDepthMask(GL_FALSE);
         scene.shaderList[ShaderType::DebugCascade]->UseShader();
         scene.shaderList[ShaderType::DebugCascade]->setUniform("projection", scene.projectionMatrix);
@@ -150,9 +148,7 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
 
         RenderScene(scene, &*scene.shaderList.at(ShaderType::DebugCascade), debugUniformModel, deltaTime);
         glDepthMask(GL_TRUE);
-
         glDisable(GL_POLYGON_OFFSET_FILL);
-
         glDisable(GL_STENCIL_TEST);
         glDisable(GL_BLEND);
 
@@ -165,6 +161,7 @@ void Renderer::RenderPass(Scene& scene, GLfloat deltaTime,
     {
         scene.meshList[MeshType::Quad]->DrawQuad();
     }
+   
 }
 
 

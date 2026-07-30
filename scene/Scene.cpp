@@ -25,11 +25,13 @@ void Scene::Register(GLFWwindow* thisWindow)
     // textures
     CreateTexture(TextureType::Checker, "assets/textures/checker.png");
     CreateTexture(TextureType::SpaceshipMetal, "assets/textures/Intergalactic Spaceship_metalness.jpg");
+    
     CreateTextureA(TextureType::CheckerMetal, "assets/textures/checkerMetal.png");
     CreateTextureA(TextureType::CheckerRoughness, "assets/textures/checkerRoughness.png");
 
     // models
-    CreateModel(ModelType::Spaceship, "assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
+    //CreateModel(ModelType::Spaceship, "assets/Models/Intergalactic_Spaceship-(Wavefront).obj");
+    CreateModel(ModelType::Bench, "assets/Models/Bench_HighRes.obj");
 
     // lights
     DirectionalLightList.push_back(std::make_unique<DirectionalLight>(DirectionalLight(2048, 2048,
